@@ -1,11 +1,11 @@
-Tue May 19 17:23:48 2026
+Fri May 22 17:03:50 2026
 [INFO]: Starting the SceneManager
 [INFO]: OpenGL version: 4.6.0 - Build 32.0.101.8132
 [INFO]: Graphics card vendor Intel
 [INFO]: Graphics card name Intel(R) Arc(TM) 140V GPU (8GB)
 [INFO]: GLSL Version 4.60 - Build 32.0.101.8132
-[INFO]: Created Scene0p: 
-[INFO]: Loading assets Scene0p: 
+[INFO]: Created Assignment2p: 
+[INFO]: Loading assets Assignment2p: 
 [INFO]: Uniforms:
 "modelMatrix" loc:2
 "projectionMatrix" loc:0
@@ -14,4 +14,4 @@ Tue May 19 17:23:48 2026
 
 [INFO]: Deleting the SceneManager
 [INFO]: Deleting assets Scene0g: 
-[INFO]: Deleted Scene0p: 
+[INFO]: Deleted Assignment2p: 

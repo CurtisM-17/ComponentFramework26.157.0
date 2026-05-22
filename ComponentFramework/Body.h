@@ -46,6 +46,7 @@ public:
 	void SetPos(const Vec3 newValue) { pos = newValue; }
 	Matrix4 GetModelMatrix() const;
 	void SetVelocity(const Vec3 newVal) { vel = newVal; }
+	Vec3 GetVelocity() { return vel; }
 };
 
 #endif

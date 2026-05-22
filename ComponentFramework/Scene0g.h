@@ -3,6 +3,7 @@
 #include "Scene.h"
 #include "Vector.h"
 #include <Matrix.h>
+#include "Texture.h"
 using namespace MATH;
 
 /// Forward declarations 
@@ -15,10 +16,20 @@ class Scene0g : public Scene {
 private:
 	Body* sphere;
 	Shader* shader;
-	Mesh* mesh;
-	Matrix4 projectionMatrix;
-	Matrix4 viewMatrix;
-	Matrix4 modelMatrix;
+
+	Mesh* sphereMesh;
+	Mesh* skullMesh;
+	Mesh* marioMesh;
+
+	Texture* earthTexture;
+	Texture* moonTexture;
+	Texture* marioTexture;
+	Texture* eyeTexture;
+
+	Matrix4 earthModelMatrix, moonModelMatrix, marioModelMatrix;
+	Matrix4 leftEyeMatrix, rightEyeMatrix;
+
+	Matrix4 projectionMatrix, viewMatrix;
 	bool drawInWireMode;
 	Vec3 lightPos;
 public:

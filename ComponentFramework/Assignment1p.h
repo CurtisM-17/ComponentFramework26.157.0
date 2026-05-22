@@ -1,5 +1,5 @@
-#ifndef SCENE1P_H
-#define SCENE1P_H
+#ifndef ASSIGNMENT1P_H
+#define ASSIGNMENT1P_H
 #include "Scene.h"
 #include "Vector.h"
 #include <Matrix.h>
@@ -14,7 +14,7 @@ class Body;
 class Mesh;
 class Shader;
 
-class Scene1p : public Scene {
+class Assignment1p : public Scene {
 private:
 	Body*   plane;
 	Matrix4 planeModelMatrix;
@@ -31,8 +31,8 @@ private:
 	bool    drawInWireMode;
 
 public:
-	explicit Scene1p();
-	virtual ~Scene1p();
+	explicit Assignment1p();
+	virtual ~Assignment1p();
 
 	virtual bool OnCreate() override;
 	virtual void OnDestroy() override;

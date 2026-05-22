@@ -1,9 +1,10 @@
-#ifndef SCENE0P_H
-#define SCENE0P_H
+#ifndef ASSIGNMENT2P_H
+#define ASSIGNMENT2P_H
 #include "Scene.h"
 #include "Vector.h"
 #include <Matrix.h>
 #include <Plane.h>
+#include "Trackball.h"
 
 using namespace MATH;
 using namespace MATHEX; // Plane class is hidden behind MATHEX
@@ -14,13 +15,11 @@ class Body;
 class Mesh;
 class Shader;
 
-class Scene0p : public Scene {
+class Assignment2p : public Scene {
 private:
 	Body* plane;
-	// Umer is getting annoyed with having a separate model matrix. 
-	// He will shove it into the Body class
 	Mesh* planeMesh;
-	Plane   planeShape; // this will hold the plane normal and distance to origin
+	Plane planeShape; // this will hold the plane normal and distance to origin
 
 	Mesh* sphereMesh; // vertices and normals of the sphere from the obj file
 
@@ -30,11 +29,15 @@ private:
 	Shader* shader;
 	Matrix4 projectionMatrix;
 	Matrix4 viewMatrix;
-	bool drawInWireMode;
+	bool    drawInWireMode;
+
+	Trackball trackball;
+	Vec3       cameraPos;
+	Quaternion cameraOrientation, oldCameraOrientation;
 
 public:
-	explicit Scene0p();
-	virtual ~Scene0p();
+	explicit Assignment2p();
+	virtual ~Assignment2p();
 
 	virtual bool OnCreate() override;
 	virtual void OnDestroy() override;

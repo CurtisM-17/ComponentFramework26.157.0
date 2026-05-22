@@ -48,13 +48,16 @@
     <ClCompile Include="Body.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Scene0p.cpp">
+    <ClCompile Include="Assignment2p.cpp">
       <Filter>Source Files\Scenes</Filter>
     </ClCompile>
-    <ClCompile Include="Scene1p.cpp">
+    <ClCompile Include="Assignment1p.cpp">
       <Filter>Source Files\Scenes</Filter>
     </ClCompile>
     <ClCompile Include="Texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Trackball.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -89,13 +92,19 @@
     <ClInclude Include="Body.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Scene0p.h">
+    <ClInclude Include="Assignment2p.h">
       <Filter>Header Files\Scenes</Filter>
     </ClInclude>
-    <ClInclude Include="Scene1p.h">
+    <ClInclude Include="Assignment1p.h">
       <Filter>Header Files\Scenes</Filter>
     </ClInclude>
     <ClInclude Include="Texture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Trackball.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Collision.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -118,6 +127,12 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="shaders\colourFrag.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shaders\texturePhongFrag.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shaders\texturePhongVert.glsl">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

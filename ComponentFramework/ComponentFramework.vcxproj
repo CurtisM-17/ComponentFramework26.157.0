@@ -133,22 +133,24 @@
     <ClCompile Include="Body.cpp" />
     <ClCompile Include="Debug.cpp" />
     <ClCompile Include="Mesh.cpp" />
-    <ClCompile Include="Scene0p.cpp" />
-    <ClCompile Include="Scene1p.cpp" />
+    <ClCompile Include="Assignment2p.cpp" />
+    <ClCompile Include="Assignment1p.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Scene0g.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Timer.cpp" />
+    <ClCompile Include="Trackball.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Body.h" />
+    <ClInclude Include="Collision.h" />
     <ClInclude Include="Debug.h" />
     <ClInclude Include="Mesh.h" />
-    <ClInclude Include="Scene0p.h" />
-    <ClInclude Include="Scene1p.h" />
+    <ClInclude Include="Assignment2p.h" />
+    <ClInclude Include="Assignment1p.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Scene0g.h" />
@@ -156,6 +158,7 @@
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="tiny_obj_loader.h" />
+    <ClInclude Include="Trackball.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
@@ -167,6 +170,8 @@
     <None Include="shaders\defaultVert.glsl" />
     <None Include="shaders\phongFrag.glsl" />
     <None Include="shaders\phongVert.glsl" />
+    <None Include="shaders\texturePhongFrag.glsl" />
+    <None Include="shaders\texturePhongVert.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

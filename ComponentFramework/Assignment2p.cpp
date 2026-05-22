@@ -2,7 +2,7 @@
 #include <iostream>
 #include <SDL.h>
 #include <SDL3/SDL_events.h>
-#include "Scene0p.h"
+#include "Assignment2p.h"
 #include <MMath.h>
 #include "Debug.h"
 #include "Mesh.h"
@@ -11,8 +11,9 @@
 #include "Quaternion.h"
 #include <QMath.h>
 #include <PMath.h>
+#include "Trackball.h"
 
-Scene0p::Scene0p() :
+Assignment2p::Assignment2p() :
 	plane{ nullptr }
 	, cueBall{ nullptr }
 	, targetBall{ nullptr }
@@ -20,15 +21,15 @@ Scene0p::Scene0p() :
 	, planeMesh{ nullptr }
 	, sphereMesh{ nullptr }
 	, drawInWireMode{ true } {
-	Debug::Info("Created Scene0p: ", __FILE__, __LINE__);
+	Debug::Info("Created Assignment2p: ", __FILE__, __LINE__);
 }
 
-Scene0p::~Scene0p() {
-	Debug::Info("Deleted Scene0p: ", __FILE__, __LINE__);
+Assignment2p::~Assignment2p() {
+	Debug::Info("Deleted Assignment2p: ", __FILE__, __LINE__);
 }
 
-bool Scene0p::OnCreate() {
-	Debug::Info("Loading assets Scene0p: ", __FILE__, __LINE__);
+bool Assignment2p::OnCreate() {
+	Debug::Info("Loading assets Assignment2p: ", __FILE__, __LINE__);
 	plane = new Body();
 	plane->OnCreate();
 	plane->SetRadius(1.0f);
@@ -59,7 +60,10 @@ bool Scene0p::OnCreate() {
 	}
 
 	projectionMatrix = MMath::perspective(45.0f, (16.0f / 9.0f), 0.5f, 100.0f);
-	viewMatrix = MMath::lookAt(Vec3(0.0f, 3.0f, 10.0f), Vec3(0.0f, 0.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f));
+	//viewMatrix = MMath::lookAt(Vec3(0.0f, 3.0f, 10.0f), Vec3(0.0f, 0.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f));
+	// Set the camera's position
+	cameraPos = Vec3(0, 1, 10);
+	
 	// Testing out quaternions
 	Quaternion quatOne = Quaternion(1, Vec3(0, 0, 0));
 	Quaternion quat_i = Quaternion(0, Vec3(1, 0, 0));
@@ -77,7 +81,7 @@ bool Scene0p::OnCreate() {
 	return true;
 }
 
-void Scene0p::OnDestroy() {
+void Assignment2p::OnDestroy() {
 	Debug::Info("Deleting assets Scene0g: ", __FILE__, __LINE__);
 	plane->OnDestroy();
 	delete plane;
@@ -95,7 +99,10 @@ void Scene0p::OnDestroy() {
 	delete shader;
 }
 
-void Scene0p::HandleEvents(const SDL_Event& sdlEvent) {
+void Assignment2p::HandleEvents(const SDL_Event& sdlEvent) {
+	// Send the event to the trackball
+	trackball.HandleEvents(sdlEvent);
+
 	float angleDeg = 1.0f;
 	switch (sdlEvent.type) {
 	case SDL_EVENT_KEY_DOWN:
@@ -135,6 +142,23 @@ void Scene0p::HandleEvents(const SDL_Event& sdlEvent) {
 			planeShape.n = QMath::rotate(planeShape.n, rotation);
 		}
 		break;
+		case SDL_SCANCODE_SPACE:
+		{
+			// We are listening to you Scott
+			// The camera is looking down -z (in camera space)
+			// Have the ball's velocity changed along -z direction
+			// Switch off translations for any type of direction
+			// Set the w component to zero     x  y  z   w
+			// if w = 0, then translations are NOT allowed
+			// if w = 1, translations are allowed
+			Vec4 changeInVelCameraSpace = Vec4(0, 0, -1, 0);
+			Matrix4 cameraToWorld = MMath::inverse(viewMatrix);
+			Vec4 changeInVelWorldSpace = cameraToWorld * changeInVelCameraSpace;
+			changeInVelWorldSpace.y = 0;
+			cueBall->SetVelocity(cueBall->GetVelocity() + changeInVelWorldSpace);
+
+		}
+		break;
 		default:
 			break;
 		}
@@ -142,7 +166,8 @@ void Scene0p::HandleEvents(const SDL_Event& sdlEvent) {
 	}
 }
 
-void Scene0p::Update(const float deltaTime) {
+void Assignment2p::Update(const float deltaTime) {
+	/*
 	// We actually want to calculate the torque using the angle of the plane
 	float angleRadians = 0; // acos(plane normal DOT up vector)
 	float distanceToPivot = 0; // radius * sin(angleRadians)
@@ -166,19 +191,43 @@ void Scene0p::Update(const float deltaTime) {
 	float velMag = 0; // magnitude of angular velocity * radius
 	Vec3  velDir; // normalized angular velocity CROSS plane normal vector
 	cueBall->SetVelocity(velMag * velDir);
+	// */
+
 	cueBall->Update(deltaTime);
 
 	// Keep the ball on the plane
 	// We will use Scott's PMath to find the distance (instead of Umer's math in the assignment doc)
-	float distanceFromPlane = PMath::distance(cueBall->GetPos(), planeShape);
+	//float distanceFromPlane = PMath::distance(cueBall->GetPos(), planeShape);
 	// TODO for YOU
 	// Based on Umer's scribbles
 	// Move the ball along the plane normal by the amount (radius - distanceFromPlane)
 	// sphere->pos += .....
 
+	// Rebuild the camera's view matrix
+	// Based on position and orientation
+
+	// STEP 1: Pretend the sphere is at the origin
+	cameraPos -= cueBall->GetPos();
+
+	// STEP 2: Rotate about the change in orientation
+	oldCameraOrientation = cameraOrientation;
+	cameraOrientation = trackball.getQuat();
+	// Umer scribbled that its new / old
+	// or new * (old).inverse
+	Quaternion changeInOrientation
+		= cameraOrientation * QMath::inverse(oldCameraOrientation);
+
+	cameraPos = QMath::rotate(cameraPos, changeInOrientation);
+
+	// STEP 3: Translate back
+	cameraPos += cueBall->GetPos();
+
+	viewMatrix =
+		MMath::toMatrix4(QMath::inverse(cameraOrientation)) *
+		MMath::translate(-cameraPos);
 }
 
-void Scene0p::Render() const {
+void Assignment2p::Render() const {
 	/// Set the background color then clear the screen
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

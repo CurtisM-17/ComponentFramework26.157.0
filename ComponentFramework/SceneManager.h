@@ -10,8 +10,6 @@ public:
 	void Run();
 	bool Initialize(std::string name_, int width_, int height_);
 	void HandleEvents();
-	
-	
 private:
 	enum class SCENE_NUMBER {
 		// graphics
@@ -21,8 +19,8 @@ private:
 		SCENE3g,
 		SCENE4g,
 		// physics
-		SCENE0p,
-		SCENE1p,
+		ASSIGNMENT1p,
+		ASSIGNMENT2p,
 		SCENE2p,
 		SCENE3p,
 		SCENE4p

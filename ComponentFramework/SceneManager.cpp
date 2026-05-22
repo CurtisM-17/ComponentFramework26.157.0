@@ -3,8 +3,8 @@
 #include "Timer.h"
 #include "Window.h"
 #include "Scene0g.h"
-#include "Scene0p.h"
-#include "Scene1p.h"
+#include "Assignment1p.h"
+#include "Assignment2p.h"
 
 SceneManager::SceneManager(): 
 	currentScene{nullptr}, window{nullptr}, timer{nullptr},
@@ -48,7 +48,7 @@ bool SceneManager::Initialize(std::string name_, int width_, int height_) {
 	}
 
 	/********************************   Default first scene   ***********************/
-	BuildNewScene(SCENE_NUMBER::SCENE0p);
+	BuildNewScene(SCENE_NUMBER::ASSIGNMENT2p);
 	/********************************************************************************/
 	return true;
 }
@@ -119,12 +119,11 @@ bool SceneManager::BuildNewScene(SCENE_NUMBER scene) {
 	case SCENE_NUMBER::SCENE0g:
 		currentScene = new Scene0g();
 		break;
-	case SCENE_NUMBER::SCENE0p:
-		currentScene = new Scene0p();
+	case SCENE_NUMBER::ASSIGNMENT1p:
+		currentScene = new Assignment1p();
 		break;
-
-	case SCENE_NUMBER::SCENE1p:
-		currentScene = new Scene1p();
+	case SCENE_NUMBER::ASSIGNMENT2p:
+		currentScene = new Assignment2p();
 		break;
 
 	default:

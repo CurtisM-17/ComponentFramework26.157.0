@@ -2,7 +2,7 @@
 #include <iostream>
 #include <SDL.h>
 #include <SDL3/SDL_events.h>
-#include "Scene1p.h"
+#include "Assignment1p.h"
 #include <MMath.h>
 #include "Debug.h"
 #include "Mesh.h"
@@ -11,7 +11,7 @@
 #include "Quaternion.h"
 #include <PMath.h>
 
-Scene1p::Scene1p() : 
+Assignment1p::Assignment1p() : 
 	plane{nullptr}, 
 	shader{nullptr}, 
 	planeMesh{nullptr},
@@ -21,11 +21,11 @@ Scene1p::Scene1p() :
 	Debug::Info("Created Scene1: ", __FILE__, __LINE__);
 }
 
-Scene1p::~Scene1p() {
+Assignment1p::~Assignment1p() {
 	Debug::Info("Deleted Scene1: ", __FILE__, __LINE__);
 }
 
-bool Scene1p::OnCreate() {
+bool Assignment1p::OnCreate() {
 	Debug::Info("Loading assets Scene1: ", __FILE__, __LINE__);
 	
 	sphere = new Body();
@@ -68,8 +68,8 @@ bool Scene1p::OnCreate() {
 	return true;
 }
 
-void Scene1p::OnDestroy() {
-	Debug::Info("Deleting assets Scene1p: ", __FILE__, __LINE__);
+void Assignment1p::OnDestroy() {
+	Debug::Info("Deleting assets Assignment1p: ", __FILE__, __LINE__);
 	plane->OnDestroy();
 	delete plane;
 
@@ -85,7 +85,7 @@ void Scene1p::OnDestroy() {
 	
 }
 
-void Scene1p::HandleEvents(const SDL_Event& sdlEvent) {
+void Assignment1p::HandleEvents(const SDL_Event& sdlEvent) {
 	float angleDeg = 1.0f;
 	switch (sdlEvent.type) {
 	case SDL_EVENT_KEY_DOWN:
@@ -132,7 +132,7 @@ void Scene1p::HandleEvents(const SDL_Event& sdlEvent) {
 	}
 }
 
-void Scene1p::Update(const float deltaTime) {
+void Assignment1p::Update(const float deltaTime) {
 	float angleRad = 0; // acos(plane normal DOT up vector)
 	float distToPivot = 0; // radius * sin(angleRad)
 	float weight = 0; // mass * 9.8
@@ -178,7 +178,7 @@ void Scene1p::Update(const float deltaTime) {
 	planeModelMatrix = MMath::toMatrix4(plane->GetOrientation());
 }
 
-void Scene1p::Render() const {
+void Assignment1p::Render() const {
 	/// Set the background color then clear the screen
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
