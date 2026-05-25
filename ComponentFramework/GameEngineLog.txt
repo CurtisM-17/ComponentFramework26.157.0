@@ -1,4 +1,4 @@
-Sun May 24 19:59:01 2026
+Mon May 25 03:49:15 2026
 [INFO]: Starting the SceneManager
 [INFO]: OpenGL version: 4.6.0 - Build 32.0.101.8132
 [INFO]: Graphics card vendor Intel
@@ -7,11 +7,12 @@ Sun May 24 19:59:01 2026
 [INFO]: Created Scene1: 
 [INFO]: Loading assets Scene1: 
 [INFO]: Uniforms:
-"lightPos" loc:2
+"lightCount" loc:1
+"lightPos[0]" loc:2
 "modelMatrix" loc:0
-"projectionMatrix" loc:3
-"viewMatrix" loc:1
-"texture" loc:4
+"projectionMatrix" loc:8
+"viewMatrix" loc:9
+"texture" loc:10
 
 [INFO]: Deleting the SceneManager
 [INFO]: Deleting assets Scene1: 

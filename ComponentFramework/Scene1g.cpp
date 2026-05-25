@@ -8,6 +8,8 @@
 #include "Shader.h"
 #include "Body.h"
 #include "Texture.h"
+#include "SceneLight.h"
+#include <array>
 
 Scene1g::Scene1g(): sphere{nullptr}, shader{nullptr}, sphereMesh{nullptr},
 					drawInWireMode{false} {
@@ -63,7 +65,10 @@ bool Scene1g::OnCreate() {
 	rightEyeMatrix.loadIdentity();
 
 	// Lights
-	lightPos = Vec3(5.0f, 0.0f, 0.0f);
+	SceneLight* light1 = CreateLight(Vec3(15.0f, 0.0f, 0.0f));
+	//SceneLight* light2 = CreateLight(Vec3(0.0f, 5.0f, 0.0f));
+	//light1->SetColor(Vec3(1, 0, 0));
+	CreateLight(Vec3(-5, -5, 0));
 
 	return true;
 }
@@ -84,6 +89,11 @@ void Scene1g::OnDestroy() {
 
 	shader->OnDestroy();
 	delete shader;
+
+	for (int i = 0; i < lights.size(); i++) {
+		delete lights[i];
+		lights[i] = nullptr;
+	}
 }
 
 void Scene1g::HandleEvents(const SDL_Event &sdlEvent) {
@@ -109,9 +119,9 @@ void Scene1g::Update(const float deltaTime) {
 
 	const static Vec3 moonPos = Vec3(3.0f, 0.0f, 0.0f);
 
-	earthModelMatrix = MMath::rotate(
-		totalElapsed * EARTH_SPIN_SPEED, 
-		Vec3(0.0f, 1.0f, 0.0f)) *
+	earthModelMatrix = 
+		//MMath::translate(Vec3(-2, 0, 0)) *
+		MMath::rotate(totalElapsed * EARTH_SPIN_SPEED, Vec3(0.0f, 1.0f, 0.0f)) *
 		MMath::rotate(90.0f, Vec3(-1.0f, 0.0f, 0.0f)
 	);
 
@@ -158,7 +168,41 @@ void Scene1g::Render() const {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
 	glUseProgram(shader->GetProgram());
-	glUniform3fv(shader->GetUniformID("lightPos"), 1, lightPos); // light
+
+	//glGetProgramiv(shader->GetProgram(), GL_LINK_STATUS, &success);
+	//std::cout << "Link status: " << success << std::endl;
+
+	// Lights
+	int count = static_cast<int>(lights.size()); // did have to look up static cast because I was getting warnings, would like to understand it more though
+	count = std::min(count, 6); // maximum light count
+	std::vector<float> lightPositions(count * 3); // convert into a vector of floats
+
+	int index = 0;
+	for (int i = 0; i < count; i++) {
+		if (!lights[i]->IsEnabled()) continue;
+
+		Vec3 pos = lights[i]->GetPosition();
+
+		lightPositions[index++] = pos.x;
+		lightPositions[index++] = pos.y;
+		lightPositions[index++] = pos.z;
+	}
+
+	GLuint program = shader->GetProgram();
+
+	//glUniform3fv(shader->GetUniformID("lightPos"), count, lightPositions.data());
+	//glUniform1i(shader->GetUniformID("lightCount"), count);
+
+	glUniform3fv(glGetUniformLocation(program, "lightPos"), count, lightPositions.data());
+	glUniform1i(glGetUniformLocation(program, "lightCount"), count);
+
+	//;
+	//;
+
+	//int loc = glGetUniformLocation(shader->GetProgram(), "lightPos");
+	//std::cout << "loc = " << loc << std::endl;
+
+	// Matrices
 	glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, projectionMatrix);
 	glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, viewMatrix);
 
