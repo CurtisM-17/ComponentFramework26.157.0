@@ -66,9 +66,15 @@ bool Scene1g::OnCreate() {
 
 	// Lights
 	SceneLight* light1 = CreateLight(Vec3(15.0f, 0.0f, 0.0f));
-	//SceneLight* light2 = CreateLight(Vec3(0.0f, 5.0f, 0.0f));
-	//light1->SetColor(Vec3(1, 0, 0));
-	CreateLight(Vec3(-5, -5, 0));
+	light1->SetColor(Vec4(1.0f, 0.0f, 0.0f, 0.0f)); // red light
+	light1->SetSpecular(Vec4(1.0f, 1.0f, 0.0f, 0.0f));
+	SceneLight* light2 = CreateLight(Vec3(-5.0f, 0.0f, 0.0f));
+	light2->SetColor(Vec4(0.0f, 0.0f, 0.75f, 0.0f)); // blue light
+
+	CreateLight(Vec3(0, -5, 0));
+
+	SceneLight* light3 = CreateLight(Vec3(0, 5, 0));
+	light3->SetColor(Vec4(0.0f, 0.5f, 0.0f, 0.0f));
 
 	return true;
 }
@@ -169,9 +175,6 @@ void Scene1g::Render() const {
 	}
 	glUseProgram(shader->GetProgram());
 
-	//glGetProgramiv(shader->GetProgram(), GL_LINK_STATUS, &success);
-	//std::cout << "Link status: " << success << std::endl;
-
 	// Lights
 	int count = static_cast<int>(lights.size()); // did have to look up to use static cast because I was getting warnings, would like to understand it more though
 	count = std::min(count, 6); // maximum light count
@@ -185,6 +188,9 @@ void Scene1g::Render() const {
 		Vec3 pos = lights[i]->GetPosition();
 		Vec4 col = lights[i]->GetColor();
 		Vec4 spec = lights[i]->GetSpecular();
+
+		// Take all of these vectors and put their values in basic arrays
+		// i.e. Vec4(1, 2, 3, 4), Vec4(7, 8, 9, 10) -> int[] {1, 2, 3, 4, 7, 8, 9, 10}
 
 		lightPositions[i * 3] = pos.x;
 		lightPositions[i * 3 + 1] = pos.y;
@@ -203,8 +209,10 @@ void Scene1g::Render() const {
 
 	GLuint program = shader->GetProgram();
 
+	// uniform ID method didn't work so I had to find this instead and it was fine
 	glUniform3fv(glGetUniformLocation(program, "lightPos"), count, lightPositions.data());
-	glUniform3fv(glGetUniformLocation(program, "lightColors"), count, lightColors.data());
+	glUniform4fv(glGetUniformLocation(program, "lightColors"), count, lightColors.data());
+	glUniform4fv(glGetUniformLocation(program, "lightSpeculars"), count, lightSpeculars.data());
 	glUniform1i(glGetUniformLocation(program, "lightCount"), count);
 
 	// Matrices

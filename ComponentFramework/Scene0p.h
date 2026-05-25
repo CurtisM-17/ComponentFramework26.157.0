@@ -5,6 +5,12 @@
 #include <Matrix.h>
 using namespace MATH;
 
+/*
+
+BLANK SCENE, NOT FOR ASSIGNMENTS!
+
+*/
+
 /// Forward declarations 
 union SDL_Event;
 class Body;
