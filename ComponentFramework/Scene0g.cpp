@@ -9,6 +9,12 @@
 #include "Shader.h"
 #include "Body.h"
 
+/*
+
+BLANK SCENE, NOT FOR ASSIGNMENTS!
+
+*/
+
 Scene0g::Scene0g() :sphere{nullptr}, shader{nullptr}, mesh{nullptr},
 					drawInWireMode{false} {
 	Debug::Info("Created Scene0: ", __FILE__, __LINE__);

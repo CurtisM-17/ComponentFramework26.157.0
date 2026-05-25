@@ -9,10 +9,11 @@ layout(location = 7) in vec3 eyeDir;
 layout(location = 8) in vec2 textureCoords;
 
 uniform int lightCount;
-uniform vec4 lightColors[];
+uniform vec4 lightColors[6];
+uniform vec4 lightSpeculars[6];
 
 void main() {
-	vec4 ks = vec4(0.3, 0.3, 0.3, 0.0);
+	//vec4 ks = vec4(0.3, 0.3, 0.3, 0.0);
 	vec4 kd = vec4(1.0, 1.0, 1.0, 0.0);
 	vec4 ka = 0.1 * kd;
 
@@ -27,8 +28,11 @@ void main() {
         float spec = max(dot(eyeDir, reflection), 0.0);
 		spec = pow(spec,14.0); // shininess
 
+		vec4 unique_kd = lightColors[i];
+		vec4 unique_ks = lightSpeculars[i];
+
 		float intensity = 1.5;
-		lighting += intensity * (diff * kd + spec * ks);
+		lighting += intensity * (diff * unique_kd + spec * unique_ks);
     }
 	
 	vec4 textureColor = texture(diffuseTexture, textureCoords);
