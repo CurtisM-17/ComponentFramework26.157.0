@@ -173,34 +173,39 @@ void Scene1g::Render() const {
 	//std::cout << "Link status: " << success << std::endl;
 
 	// Lights
-	int count = static_cast<int>(lights.size()); // did have to look up static cast because I was getting warnings, would like to understand it more though
+	int count = static_cast<int>(lights.size()); // did have to look up to use static cast because I was getting warnings, would like to understand it more though
 	count = std::min(count, 6); // maximum light count
 	std::vector<float> lightPositions(count * 3); // convert into a vector of floats
+	std::vector<float> lightColors(count * 4); // colors/diffuse
+	std::vector<float> lightSpeculars(count * 4); // colors
 
-	int index = 0;
 	for (int i = 0; i < count; i++) {
 		if (!lights[i]->IsEnabled()) continue;
 
 		Vec3 pos = lights[i]->GetPosition();
+		Vec4 col = lights[i]->GetColor();
+		Vec4 spec = lights[i]->GetSpecular();
 
-		lightPositions[index++] = pos.x;
-		lightPositions[index++] = pos.y;
-		lightPositions[index++] = pos.z;
+		lightPositions[i * 3] = pos.x;
+		lightPositions[i * 3 + 1] = pos.y;
+		lightPositions[i * 3 + 2] = pos.z;
+
+		lightColors[i * 4] = col.x;
+		lightColors[i * 4 + 1] = col.y;
+		lightColors[i * 4 + 2] = col.z;
+		lightColors[i * 4 + 3] = col.w;
+
+		lightSpeculars[i * 4] = spec.x;
+		lightSpeculars[i * 4 + 1] = spec.y;
+		lightSpeculars[i * 4 + 2] = spec.z;
+		lightSpeculars[i * 4 + 3] = spec.w;
 	}
 
 	GLuint program = shader->GetProgram();
 
-	//glUniform3fv(shader->GetUniformID("lightPos"), count, lightPositions.data());
-	//glUniform1i(shader->GetUniformID("lightCount"), count);
-
 	glUniform3fv(glGetUniformLocation(program, "lightPos"), count, lightPositions.data());
+	glUniform3fv(glGetUniformLocation(program, "lightColors"), count, lightColors.data());
 	glUniform1i(glGetUniformLocation(program, "lightCount"), count);
-
-	//;
-	//;
-
-	//int loc = glGetUniformLocation(shader->GetProgram(), "lightPos");
-	//std::cout << "loc = " << loc << std::endl;
 
 	// Matrices
 	glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, projectionMatrix);
