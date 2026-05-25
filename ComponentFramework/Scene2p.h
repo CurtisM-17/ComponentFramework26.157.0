@@ -1,5 +1,5 @@
-#ifndef ASSIGNMENT2P_H
-#define ASSIGNMENT2P_H
+#ifndef SCENE2P_H
+#define SCENE2P_H
 #include "Scene.h"
 #include "Vector.h"
 #include <Matrix.h>
@@ -15,7 +15,7 @@ class Body;
 class Mesh;
 class Shader;
 
-class Assignment2p : public Scene {
+class Scene2p : public Scene {
 private:
 	Body* plane;
 	Mesh* planeMesh;
@@ -36,8 +36,8 @@ private:
 	Quaternion cameraOrientation, oldCameraOrientation;
 
 public:
-	explicit Assignment2p();
-	virtual ~Assignment2p();
+	explicit Scene2p();
+	virtual ~Scene2p();
 
 	virtual bool OnCreate() override;
 	virtual void OnDestroy() override;

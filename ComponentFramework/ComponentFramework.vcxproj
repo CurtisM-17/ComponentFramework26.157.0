@@ -133,11 +133,15 @@
     <ClCompile Include="Body.cpp" />
     <ClCompile Include="Debug.cpp" />
     <ClCompile Include="Mesh.cpp" />
-    <ClCompile Include="Assignment2p.cpp" />
-    <ClCompile Include="Assignment1p.cpp" />
+    <ClCompile Include="Scene0g.cpp" />
+    <ClCompile Include="Scene0p.cpp" />
+    <ClCompile Include="Scene1g.cpp" />
+    <ClCompile Include="Scene2p.cpp" />
+    <ClCompile Include="Scene1p.cpp" />
+    <ClCompile Include="SceneLight.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Scene0g.cpp" />
+    <ClCompile Include="Scene2g.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Timer.cpp" />
@@ -149,11 +153,15 @@
     <ClInclude Include="Collision.h" />
     <ClInclude Include="Debug.h" />
     <ClInclude Include="Mesh.h" />
-    <ClInclude Include="Assignment2p.h" />
-    <ClInclude Include="Assignment1p.h" />
+    <ClInclude Include="Scene0g.h" />
+    <ClInclude Include="Scene0p.h" />
+    <ClInclude Include="Scene1g.h" />
+    <ClInclude Include="Scene2p.h" />
+    <ClInclude Include="Scene1p.h" />
+    <ClInclude Include="SceneLight.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="Scene.h" />
-    <ClInclude Include="Scene0g.h" />
+    <ClInclude Include="Scene2g.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Timer.h" />
@@ -170,6 +178,8 @@
     <None Include="shaders\defaultVert.glsl" />
     <None Include="shaders\phongFrag.glsl" />
     <None Include="shaders\phongVert.glsl" />
+    <None Include="shaders\textureMultiPhongFrag.glsl" />
+    <None Include="shaders\textureMultiPhongVert.glsl" />
     <None Include="shaders\texturePhongFrag.glsl" />
     <None Include="shaders\texturePhongVert.glsl" />
   </ItemGroup>

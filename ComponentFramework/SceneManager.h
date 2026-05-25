@@ -19,8 +19,8 @@ private:
 		SCENE3g,
 		SCENE4g,
 		// physics
-		ASSIGNMENT1p,
-		ASSIGNMENT2p,
+		SCENE0p,
+		SCENE1p,
 		SCENE2p,
 		SCENE3p,
 		SCENE4p

@@ -2,9 +2,14 @@
 #include "SceneManager.h"
 #include "Timer.h"
 #include "Window.h"
+// graphics
 #include "Scene0g.h"
-#include "Assignment1p.h"
-#include "Assignment2p.h"
+#include "Scene1g.h"
+#include "Scene2g.h"
+// physics
+#include "Scene0p.h"
+#include "Scene1p.h"
+#include "Scene2p.h"
 
 SceneManager::SceneManager(): 
 	currentScene{nullptr}, window{nullptr}, timer{nullptr},
@@ -48,7 +53,7 @@ bool SceneManager::Initialize(std::string name_, int width_, int height_) {
 	}
 
 	/********************************   Default first scene   ***********************/
-	BuildNewScene(SCENE_NUMBER::ASSIGNMENT2p);
+	BuildNewScene(SCENE_NUMBER::SCENE1g);
 	/********************************************************************************/
 	return true;
 }
@@ -116,14 +121,25 @@ bool SceneManager::BuildNewScene(SCENE_NUMBER scene) {
 	}
 
 	switch (scene) {
+	// graphics
 	case SCENE_NUMBER::SCENE0g:
 		currentScene = new Scene0g();
 		break;
-	case SCENE_NUMBER::ASSIGNMENT1p:
-		currentScene = new Assignment1p();
+	case SCENE_NUMBER::SCENE1g:
+		currentScene = new Scene1g();
 		break;
-	case SCENE_NUMBER::ASSIGNMENT2p:
-		currentScene = new Assignment2p();
+	case SCENE_NUMBER::SCENE2g:
+		currentScene = new Scene2g();
+		break;
+	// physics
+	case SCENE_NUMBER::SCENE0p:
+		currentScene = new Scene0p();
+		break;
+	case SCENE_NUMBER::SCENE1p:
+		currentScene = new Scene1p();
+		break;
+	case SCENE_NUMBER::SCENE2p:
+		currentScene = new Scene2p();
 		break;
 
 	default:

@@ -1,8 +1,9 @@
-#ifndef SCENE0_H
-#define SCENE0_H
+#ifndef SCENE2_H
+#define SCENE2_H
 #include "Scene.h"
 #include "Vector.h"
 #include <Matrix.h>
+#include "Texture.h"
 using namespace MATH;
 
 /// Forward declarations 
@@ -11,19 +12,29 @@ class Body;
 class Mesh;
 class Shader;
 
-class Scene0g : public Scene {
+class Scene2g : public Scene {
 private:
 	Body* sphere;
 	Shader* shader;
-	Mesh* mesh;
-	Matrix4 projectionMatrix;
-	Matrix4 viewMatrix;
-	Matrix4 modelMatrix;
-	bool drawInWireMode;
 
+	Mesh* sphereMesh;
+	Mesh* skullMesh;
+	Mesh* marioMesh;
+
+	Texture* earthTexture;
+	Texture* moonTexture;
+	Texture* marioTexture;
+	Texture* eyeTexture;
+
+	Matrix4 earthModelMatrix, moonModelMatrix, marioModelMatrix;
+	Matrix4 leftEyeMatrix, rightEyeMatrix;
+
+	Matrix4 projectionMatrix, viewMatrix;
+	bool drawInWireMode;
+	Vec3 lightPos;
 public:
-	explicit Scene0g();
-	virtual ~Scene0g();
+	explicit Scene2g();
+	virtual ~Scene2g();
 
 	virtual bool OnCreate() override;
 	virtual void OnDestroy() override;

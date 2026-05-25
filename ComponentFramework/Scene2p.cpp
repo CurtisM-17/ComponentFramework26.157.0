@@ -2,7 +2,7 @@
 #include <iostream>
 #include <SDL.h>
 #include <SDL3/SDL_events.h>
-#include "Assignment2p.h"
+#include "Scene2p.h"
 #include <MMath.h>
 #include "Debug.h"
 #include "Mesh.h"
@@ -13,7 +13,7 @@
 #include <PMath.h>
 #include "Trackball.h"
 
-Assignment2p::Assignment2p() :
+Scene2p::Scene2p() :
 	plane{ nullptr }
 	, cueBall{ nullptr }
 	, targetBall{ nullptr }
@@ -21,15 +21,15 @@ Assignment2p::Assignment2p() :
 	, planeMesh{ nullptr }
 	, sphereMesh{ nullptr }
 	, drawInWireMode{ true } {
-	Debug::Info("Created Assignment2p: ", __FILE__, __LINE__);
+	Debug::Info("Created Scene2p: ", __FILE__, __LINE__);
 }
 
-Assignment2p::~Assignment2p() {
-	Debug::Info("Deleted Assignment2p: ", __FILE__, __LINE__);
+Scene2p::~Scene2p() {
+	Debug::Info("Deleted Scene2p: ", __FILE__, __LINE__);
 }
 
-bool Assignment2p::OnCreate() {
-	Debug::Info("Loading assets Assignment2p: ", __FILE__, __LINE__);
+bool Scene2p::OnCreate() {
+	Debug::Info("Loading assets Scene2p: ", __FILE__, __LINE__);
 	plane = new Body();
 	plane->OnCreate();
 	plane->SetRadius(1.0f);
@@ -81,7 +81,7 @@ bool Assignment2p::OnCreate() {
 	return true;
 }
 
-void Assignment2p::OnDestroy() {
+void Scene2p::OnDestroy() {
 	Debug::Info("Deleting assets Scene0g: ", __FILE__, __LINE__);
 	plane->OnDestroy();
 	delete plane;
@@ -99,7 +99,7 @@ void Assignment2p::OnDestroy() {
 	delete shader;
 }
 
-void Assignment2p::HandleEvents(const SDL_Event& sdlEvent) {
+void Scene2p::HandleEvents(const SDL_Event& sdlEvent) {
 	// Send the event to the trackball
 	trackball.HandleEvents(sdlEvent);
 
@@ -166,7 +166,7 @@ void Assignment2p::HandleEvents(const SDL_Event& sdlEvent) {
 	}
 }
 
-void Assignment2p::Update(const float deltaTime) {
+void Scene2p::Update(const float deltaTime) {
 	/*
 	// We actually want to calculate the torque using the angle of the plane
 	float angleRadians = 0; // acos(plane normal DOT up vector)
@@ -227,7 +227,7 @@ void Assignment2p::Update(const float deltaTime) {
 		MMath::translate(-cameraPos);
 }
 
-void Assignment2p::Render() const {
+void Scene2p::Render() const {
 	/// Set the background color then clear the screen
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
