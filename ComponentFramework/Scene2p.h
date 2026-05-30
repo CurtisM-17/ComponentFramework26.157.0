@@ -32,7 +32,9 @@ private:
 	bool    drawInWireMode;
 
 	Trackball trackball;
-	Vec3       cameraPos;
+
+	Vec3 cameraPos;
+	Vec3 cameraOffset;
 	Quaternion cameraOrientation, oldCameraOrientation;
 
 public:

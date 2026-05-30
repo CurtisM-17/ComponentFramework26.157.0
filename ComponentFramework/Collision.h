@@ -1,19 +1,15 @@
 #pragma once
 #include "Body.h"
+// Collision stuff is just a bunch of functions
+// So we don't need a class. I'll just have a namespace
+// I got this idea from the book "Beautiful C++: 30 Core Guidelines for Writing 
+// Clean, Safe, and Fast Code" 
 
 namespace COLLISION {
 
-	bool detection(const Body& a, const Body& b) {
-		// TODO for part 1
-		// Remember game physics 1? Collision detection between circles
-		// Work out the distance between sphere a and b
-		// And compare it to radius of a + radius of b
-		// if distance > radius of a + radius of b then return false
-	}
+	bool detection(const Body& a, const Body& b);
 
 	// I will change the velocities of ball a and b (so no const keyword)
-	void response(Body& a, Body& b) {
-		
-	}
+	void response(Body& a, Body& b);
 
 }

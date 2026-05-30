@@ -51,9 +51,9 @@ void Trackball::onMouseMove(int x, int y) {
 	if (mouseDown == false) return;
 	endV = getMouseVector(x, y);
 	float cosAngle = VMath::dot(beginV, endV);
-	if (cosAngle <= VERY_SMALL) {
+	//if (cosAngle <= VERY_SMALL) {
 		//printf("%f\n", cosAngle);
-	}
+	//}
 	float angle = acos(cosAngle) * 180.0f / FLOAT_PI; /// acos() returns radians must convert to degrees
 	Vec3 rotAxis = VMath::cross(beginV, endV);
 	// Umer's quick hack to remove the roll (doesn't work 100%)
@@ -69,9 +69,7 @@ void Trackball::onMouseMove(int x, int y) {
 	Quaternion pitch = QMath::angleAxisRotation(factor * (beginV.y - endV.y), Vec3(-1, 0, 0));
 	Quaternion yaw = QMath::angleAxisRotation(factor * (beginV.x - endV.x), Vec3(0, 1, 0));
 	delta = pitch * yaw;
-	// delta = yaw;
-
-	//delta.print();
+	//delta.ijk.z = 0; // Doesn't work
 
 	mouseRotationQuat = prevQuat * delta; // UN - Spent a day realizing that order of multiplication is important here
 }

@@ -131,6 +131,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Body.cpp" />
+    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Collision.cpp" />
     <ClCompile Include="Debug.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Scene0g.cpp" />
@@ -138,11 +140,14 @@
     <ClCompile Include="Scene1g.cpp" />
     <ClCompile Include="Scene2p.cpp" />
     <ClCompile Include="Scene1p.cpp" />
+    <ClCompile Include="Scene3g.cpp" />
+    <ClCompile Include="Scene3p.cpp" />
     <ClCompile Include="SceneLight.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Scene2g.cpp" />
     <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Trackball.cpp" />
@@ -150,6 +155,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Body.h" />
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="Collision.h" />
     <ClInclude Include="Debug.h" />
     <ClInclude Include="Mesh.h" />
@@ -158,11 +164,14 @@
     <ClInclude Include="Scene1g.h" />
     <ClInclude Include="Scene2p.h" />
     <ClInclude Include="Scene1p.h" />
+    <ClInclude Include="Scene3g.h" />
+    <ClInclude Include="Scene3p.h" />
     <ClInclude Include="SceneLight.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Scene2g.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="Skybox.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="tiny_obj_loader.h" />

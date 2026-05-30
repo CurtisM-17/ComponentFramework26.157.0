@@ -35,12 +35,44 @@ void Body::UpdateAngularVelocity(float deltaTime) {
 	angularVel += angularAcc * deltaTime;
 }
 
-Matrix4 Body::GetModelMatrix() const
-{
+void Body::UpdateVelocity(float deltaTime) {
+	vel += accel * deltaTime;
+}
+
+void Body::UpdatePosition(float deltaTime) {
+	// Ignore accel for our constraint
+	pos += vel * deltaTime;
+}
+
+Matrix4 Body::GetModelMatrix() const {
 	Matrix4 T = MMath::translate(pos);
 	Matrix4 R = MMath::toMatrix4(orientation);
 	Matrix4 S = MMath::scale(radius, radius, radius);
 	return T * R * S;
+}
+
+void Body::StraightLineConstraint(float slope, float yIntercept, float deltaTime) {
+	// Code up Umer's scribbles
+	float positionConstraint = pos.y - slope * pos.x - yIntercept;
+	// JV is the velocity constraint
+	float JV = vel.y - slope * vel.x;
+	// JT is the Jacobian transposed. Remember Scott's vectors are columns
+	// JT is the direction to punch
+	Vec3 JT = Vec3(-slope, 1, 0);
+	// beta is a constant for the bias term
+	float beta = 0.1;
+	// Abort if deltaTime = 0
+	if (deltaTime < VERY_SMALL) return;
+	float bias = beta * positionConstraint / deltaTime;
+
+	// Jacobian multiplied with its transpose
+	float JJT = (slope * slope) + 1;
+
+	// Lagrangian is how much to punch by
+	float lagrangian = mass * (-JV - bias) / JJT;
+
+	// Finally update velocity
+	vel += JT * lagrangian / mass;
 }
 
 void Body::ApplyForce(Vec3 force) {

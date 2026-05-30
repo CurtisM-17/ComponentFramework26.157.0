@@ -12,6 +12,7 @@
 #include <QMath.h>
 #include <PMath.h>
 #include "Trackball.h"
+#include "Collision.h"
 
 Scene2p::Scene2p() :
 	plane{ nullptr }
@@ -62,7 +63,8 @@ bool Scene2p::OnCreate() {
 	projectionMatrix = MMath::perspective(45.0f, (16.0f / 9.0f), 0.5f, 100.0f);
 	//viewMatrix = MMath::lookAt(Vec3(0.0f, 3.0f, 10.0f), Vec3(0.0f, 0.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f));
 	// Set the camera's position
-	cameraPos = Vec3(0, 1, 10);
+	cameraOffset = Vec3(0, 0, 10);
+	cameraPos = cueBall->GetPos() + cameraOffset;
 	
 	// Testing out quaternions
 	Quaternion quatOne = Quaternion(1, Vec3(0, 0, 0));
@@ -148,15 +150,25 @@ void Scene2p::HandleEvents(const SDL_Event& sdlEvent) {
 			// The camera is looking down -z (in camera space)
 			// Have the ball's velocity changed along -z direction
 			// Switch off translations for any type of direction
-			// Set the w component to zero     x  y  z   w
 			// if w = 0, then translations are NOT allowed
 			// if w = 1, translations are allowed
+			// Set the w component to zero     x  y  z   w
 			Vec4 changeInVelCameraSpace = Vec4(0, 0, -1, 0);
 			Matrix4 cameraToWorld = MMath::inverse(viewMatrix);
 			Vec4 changeInVelWorldSpace = cameraToWorld * changeInVelCameraSpace;
-			changeInVelWorldSpace.y = 0;
 			cueBall->SetVelocity(cueBall->GetVelocity() + changeInVelWorldSpace);
 
+			// Based on Umers scribbles
+			// Turn the linear vel into an angular vel
+			Vec3 angVelDir = VMath::cross(planeShape.n, cueBall->GetVelocity());
+			// Don't forget to normalize the direction, be careful of zero divide
+			if (VMath::mag(angVelDir) < VERY_SMALL) return;
+			angVelDir = VMath::normalize(angVelDir);
+			float angVelMag = VMath::mag(cueBall->GetVelocity()) / cueBall->GetRadius();
+			cueBall->SetAngularVelocity(angVelMag * angVelDir);
+
+			// Then make sure the linear velocity depends on the angularVel & normal
+			cueBall->SetVelocity(VMath::cross(cueBall->GetAngularVelocity(), planeShape.n) * cueBall->GetRadius());
 		}
 		break;
 		default:
@@ -193,6 +205,17 @@ void Scene2p::Update(const float deltaTime) {
 	cueBall->SetVelocity(velMag * velDir);
 	// */
 
+
+	// Recommendation to you all!
+	// Switch off rolling until you have collisions working
+	if (COLLISION::detection(*cueBall, *targetBall) == true) {
+		COLLISION::response(*cueBall, *targetBall);
+		// TODO for YOU to finish assignment 2
+		// Use something like my code when hitting space
+		// to turn the linear velocity into a roll
+	}
+
+	cueBall->UpdateOrientation(deltaTime);
 	cueBall->Update(deltaTime);
 
 	// Keep the ball on the plane
@@ -202,26 +225,23 @@ void Scene2p::Update(const float deltaTime) {
 	// Based on Umer's scribbles
 	// Move the ball along the plane normal by the amount (radius - distanceFromPlane)
 	// sphere->pos += .....
+	// Umer is making a orbit camera based on his scribbles on the board
+	// Fixed now thanks to Daniel
+	// Rotate the offset
+	// First figure out the change in orientation
+	oldCameraOrientation = cameraOrientation;
+	cameraOrientation = trackball.getQuat();
+	Quaternion changeInOrientation
+		= cameraOrientation * QMath::inverse(oldCameraOrientation);
+	// Then rotate the cameraOffset
+	cameraOffset = QMath::rotate(cameraOffset, changeInOrientation);
+	// Then use the offset
+	cameraPos = cueBall->GetPos() + cameraOffset;
 
 	// Rebuild the camera's view matrix
 	// Based on position and orientation
-
-	// STEP 1: Pretend the sphere is at the origin
-	cameraPos -= cueBall->GetPos();
-
-	// STEP 2: Rotate about the change in orientation
-	oldCameraOrientation = cameraOrientation;
-	cameraOrientation = trackball.getQuat();
-	// Umer scribbled that its new / old
-	// or new * (old).inverse
-	Quaternion changeInOrientation
-		= cameraOrientation * QMath::inverse(oldCameraOrientation);
-
-	cameraPos = QMath::rotate(cameraPos, changeInOrientation);
-
-	// STEP 3: Translate back
-	cameraPos += cueBall->GetPos();
-
+	// Scott demands we go back to the origin
+	// AND THEN look back down -z
 	viewMatrix =
 		MMath::toMatrix4(QMath::inverse(cameraOrientation)) *
 		MMath::translate(-cameraPos);

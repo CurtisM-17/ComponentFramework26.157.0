@@ -1,21 +1,17 @@
-Mon May 25 19:12:08 2026
+Fri May 29 17:45:44 2026
 [INFO]: Starting the SceneManager
 [INFO]: OpenGL version: 4.6.0 - Build 32.0.101.8132
 [INFO]: Graphics card vendor Intel
 [INFO]: Graphics card name Intel(R) Arc(TM) 140V GPU (8GB)
 [INFO]: GLSL Version 4.60 - Build 32.0.101.8132
-[INFO]: Created Scene1: 
-[INFO]: Loading assets Scene1: 
+[INFO]: Created Scene3p: 
+[INFO]: Loading assets Scene3p: 
 [INFO]: Uniforms:
-"lightCount" loc:1
-"lightPos[0]" loc:2
-"modelMatrix" loc:0
-"projectionMatrix" loc:8
-"viewMatrix" loc:9
-"diffuseTexture" loc:22
-"lightColors[0]" loc:10
-"lightSpeculars[0]" loc:16
+"modelMatrix" loc:2
+"projectionMatrix" loc:0
+"viewMatrix" loc:1
+"color" loc:3
 
 [INFO]: Deleting the SceneManager
-[INFO]: Deleting assets Scene1: 
-[INFO]: Deleted Scene1: 
+[INFO]: Deleting assets Scene0g: 
+[INFO]: Deleted Scene3p: 
