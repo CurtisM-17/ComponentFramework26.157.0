@@ -2,7 +2,7 @@
 #extension GL_ARB_separate_shader_objects : enable
 
 layout(location = 0) out vec4 fragColor;
-uniform sampler2D texture;
+uniform sampler2D diffuseTexture;
 layout(location = 0) in vec3 vertNormal;
 layout(location = 1) in vec3 lightDir;
 layout(location = 2) in vec3 eyeDir; 
@@ -21,6 +21,6 @@ void main() {
 	spec = pow(spec,14.0); // shininess
 	//fragColor =  ka + (diff * kd) + (spec * ks);
 
-	vec4 textureColor = texture(texture, textureCoords);
+	vec4 textureColor = texture(diffuseTexture, textureCoords);
 	fragColor = (ka + (diff * kd) + (spec * ks)) * textureColor;
 }

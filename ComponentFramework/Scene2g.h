@@ -4,6 +4,8 @@
 #include "Vector.h"
 #include <Matrix.h>
 #include "Texture.h"
+#include "Camera.h"
+#include "Trackball.h"
 using namespace MATH;
 
 /// Forward declarations 
@@ -19,19 +21,18 @@ private:
 
 	Mesh* sphereMesh;
 	Mesh* skullMesh;
-	Mesh* marioMesh;
 
-	Texture* earthTexture;
-	Texture* moonTexture;
-	Texture* marioTexture;
+	Texture* skullTexture;
 	Texture* eyeTexture;
 
-	Matrix4 earthModelMatrix, moonModelMatrix, marioModelMatrix;
-	Matrix4 leftEyeMatrix, rightEyeMatrix;
+	Matrix4 skullModelMatrix, leftEyeMatrix, rightEyeMatrix;
+	float skullRotVelocity, skullRotation;
 
 	Matrix4 projectionMatrix, viewMatrix;
 	bool drawInWireMode;
 	Vec3 lightPos;
+
+	Matrix4 invNDC;
 public:
 	explicit Scene2g();
 	virtual ~Scene2g();

@@ -1,17 +1,18 @@
-Fri May 29 17:45:44 2026
+Sun May 31 00:15:07 2026
 [INFO]: Starting the SceneManager
-[INFO]: OpenGL version: 4.6.0 - Build 32.0.101.8132
-[INFO]: Graphics card vendor Intel
-[INFO]: Graphics card name Intel(R) Arc(TM) 140V GPU (8GB)
-[INFO]: GLSL Version 4.60 - Build 32.0.101.8132
-[INFO]: Created Scene3p: 
-[INFO]: Loading assets Scene3p: 
+[INFO]: OpenGL version: 4.6.0 NVIDIA 596.36
+[INFO]: Graphics card vendor NVIDIA Corporation
+[INFO]: Graphics card name NVIDIA GeForce RTX 4070/PCIe/SSE2
+[INFO]: GLSL Version 4.60 NVIDIA
+[INFO]: Created Scene2: 
+[INFO]: Loading assets Scene2: 
 [INFO]: Uniforms:
+"diffuseTexture" loc:0
+"lightPos" loc:1
 "modelMatrix" loc:2
-"projectionMatrix" loc:0
-"viewMatrix" loc:1
-"color" loc:3
+"projectionMatrix" loc:3
+"viewMatrix" loc:4
 
 [INFO]: Deleting the SceneManager
-[INFO]: Deleting assets Scene0g: 
-[INFO]: Deleted Scene3p: 
+[INFO]: Deleting assets Scene2: 
+[INFO]: Deleted Scene2: 
