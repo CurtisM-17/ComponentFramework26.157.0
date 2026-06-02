@@ -138,12 +138,17 @@ void Scene3p::Update(const float deltaTime) {
 		// F_drag = -dragCoeff * vel
 		float dragCoeff = 2.0f;
 		Vec3 dragForce = -dragCoeff * tentacleSpheres[i]->GetVelocity();
+
 		tentacleSpheres[i]->ApplyForce(gravForce + dragForce);
 		tentacleSpheres[i]->UpdateVelocity(deltaTime);
 		// Do the constraint to correct the velocity
-		float slope = 2;
-		float yIntercept = 3;
-		tentacleSpheres[i]->StraightLineConstraint(slope, yIntercept, deltaTime);
+		//float slope = 2;
+		//float yIntercept = 3;
+		//tentacleSpheres[i]->StraightLineConstraint(slope, yIntercept, deltaTime);
+		float a = 2;
+		float b = -4;
+		float c = 1;
+		tentacleSpheres[i]->QuadraticConstraint(a, b, c, deltaTime);
 
 		tentacleSpheres[i]->UpdatePosition(deltaTime);
 	}

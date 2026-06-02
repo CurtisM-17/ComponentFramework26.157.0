@@ -75,6 +75,30 @@ void Body::StraightLineConstraint(float slope, float yIntercept, float deltaTime
 	vel += JT * lagrangian / mass;
 }
 
+void Body::QuadraticConstraint(float a, float b, float c, float deltaTime) {
+	// Code up Umer's scribbles
+	float positionConstraint = pos.y - a * pos.x * pos.x - b * pos.x - c;
+	// JV is the velocity constraint
+	float JV = vel.y - a * 2 * pos.x * vel.x - b * vel.x;
+	// JT is the Jacobian transposed. Remember Scott's vectors are columns
+	// JT is the direction to punch
+	Vec3 JT = Vec3(-a * 2 * pos.x - b, 1, 0);
+	// beta is a constant for the bias term
+	float beta = 0.01;
+	// Abort if deltaTime = 0
+	if (deltaTime < VERY_SMALL) return;
+	float bias = beta * positionConstraint / deltaTime;
+
+	// Jacobian multiplied with its transpose
+	float JJT = (-a * 2 * pos.x - b) * (-a * 2 * pos.x - b) + 1;
+
+	// Lagrangian is how much to punch by
+	float lagrangian = mass * (-JV - bias) / JJT;
+
+	// Finally update velocity
+	vel += JT * lagrangian / mass;
+}
+
 void Body::ApplyForce(Vec3 force) {
 	accel = force / mass;
 }

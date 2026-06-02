@@ -62,6 +62,7 @@ public:
 		return mass;
 	}
 	void StraightLineConstraint(float slope, float yIntercept, float deltaTime);
+	void QuadraticConstraint(float a, float b, float c, float deltaTime);
 };
 
 #endif
