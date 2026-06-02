@@ -1,15 +1,20 @@
 #pragma once
 #include <iostream>
-
-using std::string;
+#include <glew.h>
+#include "Mesh.h"
+#include "Shader.h"
 
 class Skybox {
-	const string negx;
-	const string negy;
-	const string negz;
-	const string posx;
-	const string posy;
-	const string posz;
+	const char* negx;
+	const char* negy;
+	const char* negz;
+	const char* posx;
+	const char* posy;
+	const char* posz;
+
+	GLuint textureID;
+	Mesh* cube;
+	Shader* shader;
 public:
 	Skybox(
 		const char* negx_,
@@ -20,5 +25,10 @@ public:
 		const char* posz_
 	);
 	~Skybox();
+
+	Shader* GetShader() const { return shader; }
+
+	bool LoadImages();
+	void Render() const;
 };
 

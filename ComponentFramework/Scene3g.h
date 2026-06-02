@@ -6,7 +6,7 @@
 #include "Texture.h"
 #include "Camera.h"
 #include "Trackball.h"
-
+#include "Skybox.h"
 using namespace MATH;
 
 /// Forward declarations 
@@ -22,22 +22,23 @@ private:
 
 	Mesh* sphereMesh;
 	Mesh* skullMesh;
-	Mesh* marioMesh;
 
-	Texture* earthTexture;
-	Texture* moonTexture;
-	Texture* marioTexture;
+	Texture* skullTexture;
 	Texture* eyeTexture;
 
-	Matrix4 earthModelMatrix, moonModelMatrix, marioModelMatrix;
-	Matrix4 leftEyeMatrix, rightEyeMatrix;
+	Matrix4 skullModelMatrix, leftEyeMatrix, rightEyeMatrix;
+	float skullRotVelocity, skullRotation;
 
-	//Matrix4 projectionMatrix, viewMatrix;
+	Matrix4 viewMatrix;
+	bool drawInWireMode;
+	Vec3 lightPos;
+
+	Matrix4 invNDC;
 	Camera camera;
 	Trackball trackball;
 
-	bool drawInWireMode;
-	Vec3 lightPos;
+	Vec3 cameraOffset;
+	Quaternion cameraOrientation, oldCameraOrientation;
 public:
 	explicit Scene3g();
 	virtual ~Scene3g();
@@ -46,7 +47,7 @@ public:
 	virtual void OnDestroy() override;
 	virtual void Update(const float deltaTime) override;
 	virtual void Render() const override;
-	virtual void HandleEvents(const SDL_Event &sdlEvent) override;
+	virtual void HandleEvents(const SDL_Event& sdlEvent) override;
 };
 
 
