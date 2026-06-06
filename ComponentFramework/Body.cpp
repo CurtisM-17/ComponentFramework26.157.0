@@ -99,6 +99,42 @@ void Body::QuadraticConstraint(float a, float b, float c, float deltaTime) {
 	vel += JT * lagrangian / mass;
 }
 
+void Body::CircleConstraint(Vec3 circleCentre, float radius, float deltaTime) {
+	// Code up Umer's scribbles
+	float positionConstraint =
+		(pos.x - circleCentre.x) * (pos.x - circleCentre.x)
+		+ (pos.y - circleCentre.y) * (pos.y - circleCentre.y)
+		- radius * radius;
+	// JV is the velocity constraint
+	float JV =
+		2 * pos.x * vel.x + 2 * pos.y * vel.y
+		- 2 * circleCentre.x * vel.x - 2 * circleCentre.y * vel.y;
+	// JT is the Jacobian transposed. Remember Scott's vectors are columns
+	// JT is the direction to punch
+	Vec3 JT = Vec3(
+		-2 * circleCentre.x + 2 * pos.x,
+		-2 * circleCentre.y + 2 * pos.y,
+		0); // TODO for YOU. Work this out for a sphere
+
+	// beta is a constant for the bias term
+	float beta = 0.1;
+	// Abort if deltaTime = 0
+	if (deltaTime < VERY_SMALL) return;
+	float bias = beta * positionConstraint / deltaTime;
+
+	// Jacobian multiplied with its transpose
+	// Umer is using pow here instead to do a square
+	float JJT =
+		pow(-2 * circleCentre.x + 2 * pos.x, 2)
+		+ pow(-2 * circleCentre.y + 2 * pos.y, 2);
+
+	// Lagrangian is how much to punch by
+	float lagrangian = mass * (-JV - bias) / JJT;
+
+	// Finally update velocity
+	vel += JT * lagrangian / mass;
+}
+
 void Body::ApplyForce(Vec3 force) {
 	accel = force / mass;
 }

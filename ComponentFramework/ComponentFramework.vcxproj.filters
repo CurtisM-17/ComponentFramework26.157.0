@@ -198,5 +198,14 @@
     <None Include="shaders\skyboxVert.glsl">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="shaders\reflectionFrag.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shaders\reflectionVert.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shaders\refractionVert.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -65,7 +65,19 @@ bool Scene3p::OnCreate() {
 	projectionMatrix = MMath::perspective(45.0f, (16.0f / 9.0f), 0.5f, 100.0f);
 	// Set the camera's position
 	cameraOffset = Vec3(0, -4, 30);
-	cameraPos = jellyfishHead->GetPos() + cameraOffset;
+	camera.pos = jellyfishHead->GetPos() + cameraOffset;
+
+	// Skybox
+	camera.skybox = new Skybox(
+		"textures/underwater/negx.png",
+		"textures/underwater/negy.png",
+		"textures/underwater/negz.png",
+		"textures/underwater/posx.png",
+		"textures/underwater/posy.png",
+		"textures/underwater/posz.png"
+	);
+
+	camera.skybox->LoadImages();
 
 	return true;
 }
@@ -107,11 +119,25 @@ void Scene3p::HandleEvents(const SDL_Event& sdlEvent) {
 		case SDL_SCANCODE_LEFT:
 		{
 			jellyfishHead->pos.x -= deltaPos;
+			anchors[0]->pos.x -= deltaPos;
 		}
 		break;
 		case SDL_SCANCODE_RIGHT:
 		{
 			jellyfishHead->pos.x += deltaPos;
+			anchors[0]->pos.x += deltaPos;
+		}
+		break;
+		case SDL_SCANCODE_DOWN:
+		{
+			jellyfishHead->pos.y -= deltaPos;
+			anchors[0]->pos.y -= deltaPos;
+		}
+		break;
+		case SDL_SCANCODE_UP:
+		{
+			jellyfishHead->pos.y += deltaPos;
+			anchors[0]->pos.y += deltaPos;
 		}
 		break;
 		// TODO for YOU
@@ -136,7 +162,7 @@ void Scene3p::Update(const float deltaTime) {
 		// Fg = m * g
 		Vec3 gravForce = tentacleSpheres[i]->GetMass() * gravAcc;
 		// F_drag = -dragCoeff * vel
-		float dragCoeff = 2.0f;
+		float dragCoeff = 0.5f;
 		Vec3 dragForce = -dragCoeff * tentacleSpheres[i]->GetVelocity();
 
 		tentacleSpheres[i]->ApplyForce(gravForce + dragForce);
@@ -145,13 +171,29 @@ void Scene3p::Update(const float deltaTime) {
 		//float slope = 2;
 		//float yIntercept = 3;
 		//tentacleSpheres[i]->StraightLineConstraint(slope, yIntercept, deltaTime);
-		float a = 2;
-		float b = -4;
-		float c = 1;
-		tentacleSpheres[i]->QuadraticConstraint(a, b, c, deltaTime);
 
-		tentacleSpheres[i]->UpdatePosition(deltaTime);
+		//float a = 2;
+		//float b = -4;
+		//float c = 1;
+		//tentacleSpheres[i]->QuadraticConstraint(a, b, c, deltaTime);
+
+		//tentacleSpheres[i]->UpdatePosition(deltaTime);
 	}
+
+	// Do the circle constraint for one tentacle sphere
+	{
+		Vec3 circleCentre = anchors[0]->pos;
+		float radius = spacing;
+		tentacleSpheres[0]->CircleConstraint(circleCentre, radius, deltaTime);
+	}
+
+	for (int i = 0; i < tentacleSpheres.size(); i++) {
+		tentacleSpheres[i]->UpdatePosition(deltaTime);
+
+		
+	}
+
+	
 
 	// Umer is making a orbit camera based on his scribbles on the board
 	// Fixed now thanks to Daniel
@@ -165,22 +207,26 @@ void Scene3p::Update(const float deltaTime) {
 	// Then rotate the cameraOffset
 	cameraOffset = QMath::rotate(cameraOffset, changeInOrientation);
 	// Then use the offset
-	cameraPos = jellyfishHead->GetPos() + cameraOffset;
+	camera.pos = jellyfishHead->GetPos() + cameraOffset;
 	*/
 
 	// Rebuild the camera's view matrix
 	// Based on position and orientation
 	// Scott demands we go back to the origin
 	// AND THEN look back down -z
-	viewMatrix =
-		MMath::toMatrix4(QMath::inverse(cameraOrientation)) *
-		MMath::translate(-cameraPos);
+	//viewMatrix =
+		//MMath::toMatrix4(QMath::inverse(cameraOrientation)) *
+		//MMath::translate(-cameraPos);
 }
 
 void Scene3p::Render() const {
 	/// Set the background color then clear the screen
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	//glDisable(GL_DEPTH_TEST);
+	//camera.Render();
+	//glEnable(GL_DEPTH_TEST);
 
 	if (drawInWireMode) {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -190,7 +236,7 @@ void Scene3p::Render() const {
 	}
 	glUseProgram(shader->GetProgram());
 	glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, projectionMatrix);
-	glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, viewMatrix);
+	glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, camera.GetViewMatrix());
 
 	//                r   g     b  alpha (we dont use alpha just yet)
 	Vec4 pink = Vec4(242, 124, 177, 0) / 255.0f;

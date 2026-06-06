@@ -15,7 +15,8 @@ Skybox::Skybox(const char* negx_, const char* negy_, const char* negz_, const ch
 	posy(posy_),
 	posz(posz_),
 	textureID(),
-	cube()
+	cube(),
+	shader()
 {	
 	//LoadImages();
 }
@@ -91,7 +92,7 @@ bool Skybox::LoadImages() {
 	/**************************** POSITIVE Y ***************************/
 	/*******************************************************************/
 	{
-		SDL_Surface* textureSurface = IMG_Load(posx);
+		SDL_Surface* textureSurface = IMG_Load(posy);
 		if (textureSurface == nullptr) return false;
 
 		int mode = (SDL_GetPixelFormatDetails(textureSurface->format)->bytes_per_pixel == 4) ? GL_RGBA : GL_RGB;

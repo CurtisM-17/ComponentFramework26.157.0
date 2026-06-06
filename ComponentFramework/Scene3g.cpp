@@ -49,6 +49,7 @@ bool Scene3g::OnCreate() {
 
 	// Shader
 	shader = new Shader("shaders/texturePhongVert.glsl", "shaders/texturePhongFrag.glsl");
+	//shader = new Shader("shaders/reflectionVert.glsl", "shaders/reflectionFrag.glsl");
 	if (shader->OnCreate() == false) {
 		std::cout << "Shader failed ... we have a problem\n";
 	}
@@ -68,6 +69,18 @@ bool Scene3g::OnCreate() {
 	int viewport[4];
 	glGetIntegerv(GL_VIEWPORT, viewport);
 	invNDC = MMath::inverse(MMath::NDCtoViewport(viewport[2], viewport[3]));
+
+	// Skybox
+	camera.skybox = new Skybox(
+		"textures/cn_tower/negx.jpg",
+		"textures/cn_tower/negy.jpg",
+		"textures/cn_tower/negz.jpg",
+		"textures/cn_tower/posx.jpg",
+		"textures/cn_tower/posy.jpg",
+		"textures/cn_tower/posz.jpg"
+	);
+
+	camera.skybox->LoadImages();
 
 	return true;
 }
@@ -147,7 +160,7 @@ void Scene3g::Update(const float deltaTime) {
 	skullModelMatrix =
 		MMath::translate(Vec3(0.0f, 0.0f, -3.0f)) *
 		MMath::rotate(skullRotation, Vec3(0.0f, -1.0f, 0.0f)
-		);
+	);
 
 	/////////// EYES ///////////
 
@@ -197,7 +210,9 @@ void Scene3g::Update(const float deltaTime) {
 	viewMatrix =
 		MMath::toMatrix4(QMath::inverse(cameraOrientation)) *
 		MMath::translate(-camera.pos);
-	*/
+	// */
+
+	camera.orientation = QMath::inverse(trackball.getQuat());
 }
 
 void Scene3g::Render() const {
@@ -217,11 +232,13 @@ void Scene3g::Render() const {
 	}
 
 	GLuint program = shader->GetProgram();
-
 	glUseProgram(program);
+
 	glUniform3fv(glGetUniformLocation(program, "lightPos"), 1, lightPos); // light
 	glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, camera.projectionMatrix);
-	glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, viewMatrix);
+	glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, camera.GetViewMatrix());
+
+	glBindTexture(GL_TEXTURE_CUBE_MAP, camera.skybox->GetTextureID());
 
 	// /*
 	// Skull

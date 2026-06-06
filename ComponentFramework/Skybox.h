@@ -27,8 +27,8 @@ public:
 	~Skybox();
 
 	Shader* GetShader() const { return shader; }
+	GLuint GetTextureID() const { return textureID; }
 
 	bool LoadImages();
 	void Render() const;
 };
-

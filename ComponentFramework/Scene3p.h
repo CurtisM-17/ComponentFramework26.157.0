@@ -6,6 +6,7 @@
 #include <Plane.h>
 #include "Trackball.h"
 #include <vector>
+#include "Camera.h"
 
 using namespace MATH;
 using namespace MATHEX; // Plane class is hidden behind MATHEX
@@ -33,7 +34,8 @@ private:
 	Trackball trackball;
 
 	// Don't tell Scott, but I'm gonna make a camera
-	Vec3       cameraPos;
+	Camera camera;
+	//Vec3       cameraPos;
 	Vec3       cameraOffset;
 	Quaternion cameraOrientation; // this is the new one
 	Quaternion cameraOrientationOld;

@@ -7,6 +7,7 @@ Camera::Camera():
 	// Setting up field of view angle, aspect ratio, near & far z planes
 	projectionMatrix = MMath::perspective(45, 16.0f / 9.0f, 0.5f, 100.0f);
 
+	/*
 	skybox = new Skybox(
 		"textures/cn_tower/negx.jpg",
 		"textures/cn_tower/negy.jpg",
@@ -17,6 +18,7 @@ Camera::Camera():
 	);
 
 	skybox->LoadImages();
+	*/
 }
 
 Camera::~Camera() {
@@ -36,7 +38,7 @@ void Camera::Render() const {
 	Shader* shader = skybox->GetShader();
 
 	glUseProgram(shader->GetProgram());
-	glUniformMatrix4fv(shader->GetUniformID("orientationMatrix"), 1, GL_FALSE, MMath::toMatrix4(orientation));
+	glUniformMatrix4fv(shader->GetUniformID("orientationMatrix"), 1, GL_FALSE, MMath::toMatrix4(QMath::inverse(orientation)));
 	glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, projectionMatrix);
 
 	skybox->Render();
