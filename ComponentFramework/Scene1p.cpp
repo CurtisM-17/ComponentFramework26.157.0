@@ -59,11 +59,6 @@ bool Scene1p::OnCreate() {
 	Quaternion addedQuat = QMath::normalize(quat_1 + quat_i);
 	plane->SetOrientation(addedQuat);
 	planeShape.set(0, 1, 0, 0);
-	//planeNormal = Vec3(0, 1, 0);
-
-	//planeModelMatrix = MMath::toMatrix4(addedQuat);
-
-	//modelMatrix.loadIdentity();
 
 	return true;
 }
@@ -81,8 +76,6 @@ void Scene1p::OnDestroy() {
 
 	shader->OnDestroy();
 	delete shader;
-
-	
 }
 
 void Scene1p::HandleEvents(const SDL_Event& sdlEvent) {
@@ -90,9 +83,10 @@ void Scene1p::HandleEvents(const SDL_Event& sdlEvent) {
 	switch (sdlEvent.type) {
 	case SDL_EVENT_KEY_DOWN:
 		switch (sdlEvent.key.scancode) {
-		case SDL_SCANCODE_W:
+		case SDL_SCANCODE_Q:
 			drawInWireMode = !drawInWireMode;
 			break;
+		case SDL_SCANCODE_A:
 		case SDL_SCANCODE_LEFT:
 		{
 			Quaternion rotation = QMath::angleAxisRotation(angleDeg, Vec3(0, 0, 1));
@@ -102,6 +96,7 @@ void Scene1p::HandleEvents(const SDL_Event& sdlEvent) {
 			planeShape.n = QMath::rotate(planeShape.n, rotation);
 		}
 		break;
+		case SDL_SCANCODE_D:
 		case SDL_SCANCODE_RIGHT:
 		{
 			Quaternion rotation = QMath::angleAxisRotation(angleDeg, Vec3(0, 0, -1));
@@ -111,6 +106,7 @@ void Scene1p::HandleEvents(const SDL_Event& sdlEvent) {
 		break;
 		// TODO for YOU
 		// Code the UP and DOWN key to rotate the plane towards or away from you
+		case SDL_SCANCODE_W:
 		case SDL_SCANCODE_UP:
 		{
 			Quaternion rotation = QMath::angleAxisRotation(angleDeg, Vec3(-1, 0, 0));
@@ -118,6 +114,7 @@ void Scene1p::HandleEvents(const SDL_Event& sdlEvent) {
 			planeShape.n = QMath::rotate(planeShape.n, rotation);
 		}
 		break;
+		case SDL_SCANCODE_S:
 		case SDL_SCANCODE_DOWN:
 		{
 			Quaternion rotation = QMath::angleAxisRotation(angleDeg, Vec3(1, 0, 0));
@@ -132,44 +129,64 @@ void Scene1p::HandleEvents(const SDL_Event& sdlEvent) {
 	}
 }
 
+Vec3 Scene1p::NormOrNothing(const Vec3 v) {
+	// doing it this way because Scott's will throw division by zero errors
+	float mag = VMath::mag(v);
+	Vec3 newVec = v;
+
+	if (mag > VERY_SMALL) {
+		// normalize
+		// I already calculate the magnitude so may as well just do this here too instead of using the method
+		newVec = Vec3(
+			newVec.x / mag,
+			newVec.y / mag,
+			newVec.z / mag
+		);
+	}
+
+	return newVec;
+}
+
 void Scene1p::Update(const float deltaTime) {
-	float angleRad = 0; // acos(plane normal DOT up vector)
-	float distToPivot = 0; // radius * sin(angleRad)
-	float weight = 0; // mass * 9.8
+	const static Vec3 upVector = Vec3(0, 1, 0);
+	float radius = sphere->GetRadius();
+
+	////// Torque //////
+
+	// torque magnitude
+	float angleRad = acos(VMath::dot(planeShape.n, upVector)); // acos(plane normal DOT up vector)
+	float distToPivot = radius * sin(angleRad); // radius * sin(angleRad)
+	float weight = sphere->GetMass() * 9.8f; // mass * 9.8
 	float torqueMag = weight * distToPivot;
 
-	// Direction of the torque: Surface normal CROSS surface upvector
-	// Next quiz: cross product
-	// STUDY THE CROSS PRODUCT! REMEMBER HOW TO DO IT
-	Vec3 torqueDir; // up CROSS normal, and then normalize it
+	// torque direction: surface upvector CROSS surface normal
+	Vec3 torqueDir = NormOrNothing(VMath::cross(upVector, planeShape.n));
 
-	// TODO (part 2)
-	Vec3 torque = Vec3(0, 0, 1);
+	// apply the torque
+	Vec3 torque = torqueDir * torqueMag;
 	sphere->ApplyTorque(torque);
 
-	// Part 3
-	// Don't hardcode the torque vector
+	////// Velocity //////
+	// Convert angular velocity to linear velocity
+	Vec3 linearVel = VMath::cross(sphere->GetAngularVelocity(), planeShape.n * radius); // angular velocity CROSS rVector
+	sphere->SetVelocity(linearVel);
 
 	sphere->UpdateAngularVelocity(deltaTime);
 	sphere->UpdateOrientation(deltaTime);
-	// TODO (part 1)
-	// Convert angular velocity to linear velocity
-	float velMag = 0; // magnitude of angular velocity * radius
-	Vec3 velDir; // normalized angular velocity CROSS plane normal vector
-	sphere->SetAngularVelocity(velMag * velDir);
-	//sphere->SetAngularAcceleration(Vec3(0, 0, -0.1f));
 	sphere->Update(deltaTime);
 
 	// Keep the ball on the plane
 	float distFromPlane = PMath::distance(sphere->GetPos(), planeShape); // normal DOT point position
-	// TODO: Move the ball along the plane normal by the amount radius - distFromPlane
-	// sphere position += ...
 
-	// Rebuild the model matrix
+	float correction = radius - distFromPlane;
+
+	// Move along plane normal
+	sphere->SetPos(sphere->GetPos() + planeShape.n * correction);
+
+	////////////// Rebuild the model matrix //////////////
 	// Translate * Rotate * Scale
 	Matrix4 translation = MMath::translate(sphere->GetPos());
 	Matrix4 rotation = MMath::toMatrix4(sphere->GetOrientation());
-	float radius = sphere->GetRadius();
 	Matrix4 scale = MMath::scale(radius, radius, radius);
 
 	sphereModelMatrix = translation * rotation * scale;

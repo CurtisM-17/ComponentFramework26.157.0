@@ -20,6 +20,7 @@ private: /// Physics stuff
 	Vec3 accel;
 	float mass;
 
+	Matrix3 rotInertia;
 	Quaternion orientation;
 	Vec3 angularVel, angularAcc;
 	float radius;
@@ -34,33 +35,49 @@ public:
 	void OnDestroy();
 	void Update(float deltaTime);
 	void Render() const;
-	void ApplyForce(Vec3 force);
-	void ApplyTorque(Vec3 torque);
-	void SetAccel(const Vec3 &accel_) { accel = accel_;}
+
+	///////////// Getters /////////////
+	Vec3 GetAccel() const { return accel; }
 	Quaternion GetOrientation() const { return orientation; }
-	void SetOrientation(const Quaternion newValue) { orientation = newValue; }
-	void UpdateOrientation(float deltaTime);
-	void UpdateAngularVelocity(float deltaTime);
-	void UpdateVelocity(float deltaTime);
-	void UpdatePosition(float deltaTime);
-	Vec3 GetAngularVelocity() { return angularVel; }
-	void SetAngularVelocity(const Vec3 newValue) { angularVel = newValue; }
-	void SetAngularAcceleration(const Vec3 newValue) {angularAcc = newValue; }
-	void SetRadius(float newValue) { radius = newValue; }
+	Vec3 GetAngularVelocity() const { return angularVel; }
+	Vec3 GetAngularAcceleration() const { return angularVel; }
 	float GetRadius() const { return radius; }
 	Vec3 GetPos() const { return pos; }
-	void SetPos(const Vec3 newValue) { pos = newValue; }
-	Matrix4 GetModelMatrix() const;
-	void SetVelocity(const Vec3 newVal) { vel = newVal; }
+	// Build a model matrix to send to the GPU
+	Matrix4 GetModelMatrix() const; // done in Body.cpp, no setter needed (pos * orientation * scale)
 	Vec3 GetVelocity() { return vel; }
+	float GetMass() const { return mass; }
+
+	///////////// Setters /////////////
+	void SetAccel(const Vec3& accel_) { accel = accel_; }
+	void SetOrientation(const Quaternion newValue) { orientation = newValue; }
+	void SetAngularVelocity(const Vec3 newValue) { angularVel = newValue; }
+	void SetAngularAcceleration(const Vec3 newValue) { angularAcc = newValue; }
+	void SetRadius(float newValue) { radius = newValue; }
+	void SetPos(const Vec3 newValue) { pos = newValue; }
+	void SetVelocity(const Vec3 newVal) { vel = newVal; }
 	void SetMass(float mass_) {
 		// Blow up if mass is zero or less
 		assert(mass_ > VERY_SMALL);
 		mass = mass_;
 	}
-	float GetMass() const {
-		return mass;
-	}
+
+	///////////// Apply force /////////////
+	void ApplyForce(Vec3 force);
+	// Updates angular acceleration using torque and rotational inertia
+	void ApplyTorque(Vec3 torque);
+
+	///////////// Updates /////////////
+	// Updates orientation quaternion using the angular velocity
+	void UpdateOrientation(float deltaTime);
+	// Updates angular velocity using rotational equations of motion 
+	void UpdateAngularVelocity(float deltaTime);
+	void UpdateVelocity(float deltaTime);
+	// Update position or velocity using the equations of motion. It's handy
+	// later on with constraints to have these as separate methods
+	void UpdatePosition(float deltaTime);
+	
+	///////////// Constraints /////////////
 	void StraightLineConstraint(float slope, float yIntercept, float deltaTime);
 	void QuadraticConstraint(float a, float b, float c, float deltaTime);
 	void CircleConstraint(Vec3 circleCentre, float radius, float deltaTime);

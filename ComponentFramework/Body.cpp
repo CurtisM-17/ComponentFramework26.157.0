@@ -8,7 +8,11 @@ Body::Body() :
 	mass{ 1.0f },
 	mesh{ nullptr },
 	texture{ nullptr },
-	radius{1.0f}
+	radius{1.0f},
+	rotInertia(),
+	orientation(),
+	angularVel(),
+	angularAcc()
 {}
 
 Body::~Body() {}
@@ -44,10 +48,30 @@ void Body::UpdatePosition(float deltaTime) {
 	pos += vel * deltaTime;
 }
 
+void Body::ApplyForce(Vec3 force) {
+	accel = force / mass;
+}
+
+void Body::ApplyTorque(Vec3 torque) {
+	// Update the angular acceleration using the inverse rotational inertia matrix multiplied by the torque vector
+	// Apply torque to the ball and get it to spin
+	// update angular acceleration
+	// angularAcc = inverse of rationInertia * torque
+	float i_edge = ((2 / 5) * mass * radius * radius) + (mass * radius * radius);
+	rotInertia = Matrix3(
+		i_edge,	 0,    0,
+		  0,   i_edge, 0,
+		  0,     0,  i_edge
+	);
+
+	SetAngularAcceleration(MMath::inverse(rotInertia) * torque);
+}
+
 Matrix4 Body::GetModelMatrix() const {
 	Matrix4 T = MMath::translate(pos);
 	Matrix4 R = MMath::toMatrix4(orientation);
 	Matrix4 S = MMath::scale(radius, radius, radius);
+
 	return T * R * S;
 }
 
@@ -133,18 +157,6 @@ void Body::CircleConstraint(Vec3 circleCentre, float radius, float deltaTime) {
 
 	// Finally update velocity
 	vel += JT * lagrangian / mass;
-}
-
-void Body::ApplyForce(Vec3 force) {
-	accel = force / mass;
-}
-
-void Body::ApplyTorque(Vec3 torque) {
-	// Part 2: Apply torque to the ball and get it to spin
-	Matrix3 rotationIntertia; // reference assignment document
-	// update angular acceleration
-	// angularAcc = inverse of rationInertia * torque
-	// 
 }
 
 bool Body::OnCreate() {
