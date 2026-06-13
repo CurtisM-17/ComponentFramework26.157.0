@@ -140,6 +140,18 @@ void Scene3p::HandleEvents(const SDL_Event& sdlEvent) {
 			anchors[0]->pos.y += deltaPos;
 		}
 		break;
+		case SDL_SCANCODE_I:
+		{
+			jellyfishHead->pos.z += deltaPos;
+			anchors[0]->pos.z += deltaPos;
+		}
+		break;
+		case SDL_SCANCODE_P:
+		{
+			jellyfishHead->pos.z -= deltaPos;
+			anchors[0]->pos.z -= deltaPos;
+		}
+		break;
 		// TODO for YOU
 		// Code the UP and DOWN key and something for IN and OUT 
 

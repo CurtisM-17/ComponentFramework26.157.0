@@ -207,5 +207,14 @@
     <None Include="shaders\refractionVert.glsl">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="shaders\fresnelVert.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shaders\refractionFrag.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shaders\fresnelFrag.glsl">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -185,10 +185,13 @@
     <None Include="shaders\colourFrag.glsl" />
     <None Include="shaders\defaultFrag.glsl" />
     <None Include="shaders\defaultVert.glsl" />
+    <None Include="shaders\fresnelFrag.glsl" />
+    <None Include="shaders\fresnelVert.glsl" />
     <None Include="shaders\phongFrag.glsl" />
     <None Include="shaders\phongVert.glsl" />
     <None Include="shaders\reflectionFrag.glsl" />
     <None Include="shaders\reflectionVert.glsl" />
+    <None Include="shaders\refractionFrag.glsl" />
     <None Include="shaders\refractionVert.glsl" />
     <None Include="shaders\skyboxFrag.glsl" />
     <None Include="shaders\skyboxVert.glsl" />

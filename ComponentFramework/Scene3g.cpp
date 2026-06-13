@@ -48,8 +48,8 @@ bool Scene3g::OnCreate() {
 	eyeTexture->LoadImage("textures/evilEye_v2.jpg");
 
 	// Shader
-	shader = new Shader("shaders/texturePhongVert.glsl", "shaders/texturePhongFrag.glsl");
-	//shader = new Shader("shaders/reflectionVert.glsl", "shaders/reflectionFrag.glsl");
+	//shader = new Shader("shaders/texturePhongVert.glsl", "shaders/texturePhongFrag.glsl");
+	shader = new Shader("shaders/fresnelVert.glsl", "shaders/fresnelFrag.glsl");
 	if (shader->OnCreate() == false) {
 		std::cout << "Shader failed ... we have a problem\n";
 	}
