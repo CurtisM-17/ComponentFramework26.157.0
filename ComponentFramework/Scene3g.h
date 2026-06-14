@@ -21,19 +21,15 @@ private:
 	Shader* shader;
 
 	Mesh* sphereMesh;
-	Mesh* skullMesh;
+	Mesh* cubeMesh;
 
-	Texture* skullTexture;
-	Texture* eyeTexture;
-
-	Matrix4 skullModelMatrix, leftEyeMatrix, rightEyeMatrix;
-	float skullRotVelocity, skullRotation;
+	Matrix4 cubeModelMatrix, sphereModelMatrix;
+	Vec2 cubeRotVelocity, cubeRotation;
 
 	Matrix4 viewMatrix;
 	bool drawInWireMode;
 	Vec3 lightPos;
 
-	Matrix4 invNDC;
 	Camera camera;
 	Trackball trackball;
 

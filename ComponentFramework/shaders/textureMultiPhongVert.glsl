@@ -28,7 +28,6 @@ void main() {
 
 	// A lot of behaviour broke strangely when I did this and 
 	// my lights no longer looked the same, would really like to figure out why
-
 	for (int i = 0; i < lightCount; i++) {
         lightDir[i] = normalize(lightPos[i] - vertPos);
     }

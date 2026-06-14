@@ -11,15 +11,15 @@
 
 /*
 
-Arrow keys or A & D to rotate skull left and right
+WASD or arrow keys to rotate the cube around
 
 */
 
 Scene3g::Scene3g() :
 	sphere{ nullptr }, shader{ nullptr }, sphereMesh{ nullptr },
-	drawInWireMode{ false }, skullMesh{ nullptr }, skullTexture{ nullptr },
-	eyeTexture{ nullptr }, skullModelMatrix(), leftEyeMatrix(), rightEyeMatrix(),
-	viewMatrix(), lightPos(), skullRotVelocity(), skullRotation()
+	drawInWireMode{ false }, sphereModelMatrix(), viewMatrix(), 
+	lightPos(), cubeRotVelocity(), cubeRotation(Vec2(35, 0)),
+	cubeMesh()
 {
 	Debug::Info("Created Scene3: ", __FILE__, __LINE__);
 }
@@ -37,18 +37,10 @@ bool Scene3g::OnCreate() {
 	sphereMesh = new Mesh("meshes/Sphere.obj");
 	sphereMesh->OnCreate();
 
-	skullMesh = new Mesh("meshes/Skull.obj");
-	skullMesh->OnCreate();
-
-	// Textures
-	skullTexture = new Texture();
-	skullTexture->LoadImage("textures/skull_texture.jpg");
-
-	eyeTexture = new Texture();
-	eyeTexture->LoadImage("textures/evilEye_v2.jpg");
+	cubeMesh = new Mesh("meshes/Cube.obj");
+	cubeMesh->OnCreate();
 
 	// Shader
-	//shader = new Shader("shaders/texturePhongVert.glsl", "shaders/texturePhongFrag.glsl");
 	shader = new Shader("shaders/fresnelVert.glsl", "shaders/fresnelFrag.glsl");
 	if (shader->OnCreate() == false) {
 		std::cout << "Shader failed ... we have a problem\n";
@@ -58,17 +50,11 @@ bool Scene3g::OnCreate() {
 	camera.pos = Vec3(0, 0, 3.5f);
 	viewMatrix = camera.GetViewMatrix();
 
-	skullModelMatrix.loadIdentity();
-	leftEyeMatrix.loadIdentity();
-	rightEyeMatrix.loadIdentity();
+	sphereModelMatrix.loadIdentity();
+	cubeModelMatrix.loadIdentity();
 
 	// Lights
 	lightPos = Vec3(5.0f, 0.0f, 0.0f);
-
-	// Viewport (ripped this from trackball)
-	int viewport[4];
-	glGetIntegerv(GL_VIEWPORT, viewport);
-	invNDC = MMath::inverse(MMath::NDCtoViewport(viewport[2], viewport[3]));
 
 	// Skybox
 	camera.skybox = new Skybox(
@@ -93,9 +79,6 @@ void Scene3g::OnDestroy() {
 	sphereMesh->OnDestroy();
 	delete sphereMesh;
 
-	skullMesh->OnDestroy();
-	delete skullMesh;
-
 	shader->OnDestroy();
 	delete shader;
 }
@@ -106,19 +89,29 @@ void Scene3g::HandleEvents(const SDL_Event& sdlEvent) {
 	switch (sdlEvent.type) {
 	case SDL_EVENT_KEY_DOWN:
 		switch (sdlEvent.key.scancode) {
-		case SDL_SCANCODE_W:
+		case SDL_SCANCODE_Z:
 			drawInWireMode = !drawInWireMode;
 			break;
-			///// Head rotation
+		///// Cube rotation
 		case SDL_SCANCODE_LEFT:
 		case SDL_SCANCODE_A:
 			// left
-			skullRotVelocity = 1.0f;
+			cubeRotVelocity.x = 1.0f;
 			break;
 		case SDL_SCANCODE_RIGHT:
 		case SDL_SCANCODE_D:
 			// right
-			skullRotVelocity = -1.0f;
+			cubeRotVelocity.x = -1.0f;
+			break;
+		case SDL_SCANCODE_UP:
+		case SDL_SCANCODE_W:
+			// left
+			cubeRotVelocity.y = 1.0f;
+			break;
+		case SDL_SCANCODE_DOWN:
+		case SDL_SCANCODE_S:
+			// right
+			cubeRotVelocity.y = -1.0f;
 			break;
 		default:
 			break;
@@ -132,85 +125,44 @@ void Scene3g::HandleEvents(const SDL_Event& sdlEvent) {
 		case SDL_SCANCODE_RIGHT:
 		case SDL_SCANCODE_D:
 			// stop rotating
-			skullRotVelocity = 0;
+			cubeRotVelocity.x = 0;
+			break;
+		case SDL_SCANCODE_UP:
+		case SDL_SCANCODE_W:
+		case SDL_SCANCODE_DOWN:
+		case SDL_SCANCODE_S:
+			// stop rotating
+			cubeRotVelocity.y = 0;
 			break;
 		}
 	}
 }
 
 void Scene3g::Update(const float deltaTime) {
-	const static float EYE_SCALE = 0.25f;
-	const static float EYE_DIST = 0.575f;
-	const static float EYE_DEPTH = 0.9f;
-	const static float EYE_HEIGHT = 0.175f;
-	const static float SKULL_ROT_SPEED = 20.0f;
-	const static float MAX_SKULL_ANGLE = 45.0f;
+	const static float ROT_SPEED = 20.0f;
+	const static float MAX_ANGLE = 45.0f;
 
-	skullRotation = SDL_clamp(
-		skullRotation + (skullRotVelocity * SKULL_ROT_SPEED * deltaTime),
-		-MAX_SKULL_ANGLE,
-		MAX_SKULL_ANGLE
+	cubeRotation.x = SDL_clamp(
+		cubeRotation.x + (cubeRotVelocity.x * ROT_SPEED * deltaTime),
+		-MAX_ANGLE,
+		MAX_ANGLE
 	);
 
-	// Mouse position
-	Vec3 mousePos{};
-	SDL_GetMouseState(&mousePos.x, &mousePos.y);
-	mousePos = invNDC * mousePos;
-
-	skullModelMatrix =
-		MMath::translate(Vec3(0.0f, 0.0f, -3.0f)) *
-		MMath::rotate(skullRotation, Vec3(0.0f, -1.0f, 0.0f)
+	cubeRotation.y = SDL_clamp(
+		cubeRotation.y + (cubeRotVelocity.y * ROT_SPEED * deltaTime),
+		-MAX_ANGLE,
+		MAX_ANGLE
 	);
 
-	/////////// EYES ///////////
-
-	// Extract just the skull's rotation
-	Matrix4 skullRotation = skullModelMatrix; // copy the matrix
-	// Zero out the translation column so that there's only the rotation left
-	skullRotation[12] = 0.0f;
-	skullRotation[13] = 0.0f;
-	skullRotation[14] = 0.0f;
-
-	Matrix4 invSkullRotation = MMath::transpose(skullRotation); // invert the rotation
-
-	const static float EYE_ROTATION_FACTOR = 50.0f; // maximum rotation angle
-	Vec2 eyeRotationAngle = Vec2(
-		(-EYE_ROTATION_FACTOR + (EYE_ROTATION_FACTOR - -EYE_ROTATION_FACTOR)) * mousePos.x,
-		(-EYE_ROTATION_FACTOR + (EYE_ROTATION_FACTOR - -EYE_ROTATION_FACTOR)) * mousePos.y
+	cubeModelMatrix = (
+		MMath::translate(Vec3(-2.5f, 0.0f, -3.0f)) *
+		MMath::rotate(cubeRotation.x, Vec3(0.0f, -1.0f, 0.0f)) *
+		MMath::rotate(cubeRotation.y, Vec3(-1.0f, 0.0f, 0.0f))
 	);
 
-	leftEyeMatrix = (
-		skullModelMatrix *
-		MMath::translate(Vec3(EYE_DIST, EYE_HEIGHT, EYE_DEPTH)) *
-		invSkullRotation * // cancel out the skull's rotation so that the eyes always face the origin/camera
-		MMath::rotate(-90.0f, Vec3(0.0f, 1.0f, 0.0f)) * // pivot to face straight
-		MMath::rotate(eyeRotationAngle.x, Vec3(0.0f, 1.0f, 0.0f)) * // angle towards cursor (X)
-		MMath::rotate(eyeRotationAngle.y, Vec3(0.0f, 0.0f, 1.0f)) * // angle towards cursor (Y)
-		MMath::scale(Vec3(EYE_SCALE, EYE_SCALE, EYE_SCALE))
+	sphereModelMatrix = (
+		MMath::translate(Vec3(2.5f, 0.0f, -3.0f))
 	);
-
-	rightEyeMatrix = (
-		skullModelMatrix *
-		MMath::translate(Vec3(-EYE_DIST, EYE_HEIGHT, EYE_DEPTH)) *
-		invSkullRotation *
-		MMath::rotate(-90.0f, Vec3(0.0f, 1.0f, 0.0f)) *
-		MMath::rotate(eyeRotationAngle.x, Vec3(0.0f, 1.0f, 0.0f)) * // angle towards cursor (X)
-		MMath::rotate(eyeRotationAngle.y, Vec3(0.0f, 0.0f, 1.0f)) * // angle towards cursor (Y)
-		MMath::scale(Vec3(EYE_SCALE, EYE_SCALE, EYE_SCALE))
-	);
-
-	/*
-	oldCameraOrientation = cameraOrientation;
-	cameraOrientation = trackball.getQuat();
-	Quaternion changeInOrientation
-		= cameraOrientation * QMath::inverse(oldCameraOrientation);
-	// Then rotate the cameraOffset
-	cameraOffset = QMath::rotate(cameraOffset, changeInOrientation);
-
-	viewMatrix =
-		MMath::toMatrix4(QMath::inverse(cameraOrientation)) *
-		MMath::translate(-camera.pos);
-	// */
 
 	camera.orientation = QMath::inverse(trackball.getQuat());
 }
@@ -240,20 +192,13 @@ void Scene3g::Render() const {
 
 	glBindTexture(GL_TEXTURE_CUBE_MAP, camera.skybox->GetTextureID());
 
-	// /*
-	// Skull
-	glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, skullModelMatrix);
-	glBindTexture(GL_TEXTURE_2D, skullTexture->getTextureID());
-	skullMesh->Render(GL_TRIANGLES);
+	// Cube
+	glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, cubeModelMatrix);
+	cubeMesh->Render(GL_TRIANGLES);
 
-	// Eyeballs
-	glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, leftEyeMatrix);
-	glBindTexture(GL_TEXTURE_2D, eyeTexture->getTextureID());
+	// Sphere
+	glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, sphereModelMatrix);
 	sphereMesh->Render(GL_TRIANGLES);
-
-	glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, rightEyeMatrix);
-	sphereMesh->Render(GL_TRIANGLES);
-	// */
 
 	//
 	glBindTexture(GL_TEXTURE_2D, 0);
