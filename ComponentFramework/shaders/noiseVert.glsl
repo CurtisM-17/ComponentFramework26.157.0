@@ -8,16 +8,19 @@ layout(location = 2) in vec2 uvCoord;
 layout(location = 0) uniform mat4 projectionMatrix;
 layout(location = 1) uniform mat4 viewMatrix;
 layout(location = 2) uniform mat4 modelMatrix;
+layout(location = 3) uniform float totalTime;
 
 // Send 3d texture coordinates over to the fragment
-layout(location = 0) out vec3 refractionDir;
-layout(location = 1) out vec3 reflectionDir;
-layout(location = 2) out vec3 vertexDir;
-layout(location = 3) out vec3 normalCameraSpace;
+layout(location = 0) out vec3 uvwCoords;
+layout(location = 1) out vec3 refractionDir;
+layout(location = 2) out vec3 reflectionDir;
+layout(location = 3) out vec3 vertexDir;
+layout(location = 4) out vec3 normalCameraSpace;
 
+uniform sampler3D noiseSampler;
 
 void main() {
-	//uvwCoords = vVertex;
+	uvwCoords = vVertex;
     //outUVWCoord.y *= -1;
     
     // inVertex is model space (or Paul Neale)
@@ -41,7 +44,6 @@ void main() {
     refractionDir = refract(vertexDir, normalCameraSpace, eta);
     reflectionDir = reflect(vertexDir, normalCameraSpace);
 
-    //vec3 position = vVertex + normalCameraSpace;
-    //gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(pos, 1.0);
-    gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(vVertex, 1.0);
+    vec3 position = vVertex + (normalCameraSpace * vec3(0.75 * texture(noiseSampler, vVertex * totalTime * 0.3)));
+    gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
 }

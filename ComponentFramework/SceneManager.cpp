@@ -7,11 +7,14 @@
 #include "Scene1g.h"
 #include "Scene2g.h"
 #include "Scene3g.h"
+#include "Scene4g.h"
+#include "Scene5g.h"
 // physics
 #include "Scene0p.h"
 #include "Scene1p.h"
 #include "Scene2p.h"
 #include "Scene3p.h"
+#include "Scene4p.h"
 
 SceneManager::SceneManager(): 
 	currentScene{nullptr}, window{nullptr}, timer{nullptr},
@@ -54,8 +57,8 @@ bool SceneManager::Initialize(std::string name_, int width_, int height_) {
 		return false;
 	}
 
-	/********************************   Default first scene   ***********************/
-	BuildNewScene(SCENE_NUMBER::SCENE3g);
+	/****************************** Default first scene *****************************/
+	BuildNewScene(SCENE_NUMBER::SCENE4p);
 	/********************************************************************************/
 	return true;
 }
@@ -136,6 +139,12 @@ bool SceneManager::BuildNewScene(SCENE_NUMBER scene) {
 	case SCENE_NUMBER::SCENE3g:
 		currentScene = new Scene3g();
 		break;
+	case SCENE_NUMBER::SCENE4g:
+		currentScene = new Scene4g();
+		break;
+	case SCENE_NUMBER::SCENE5g:
+		currentScene = new Scene5g();
+		break;
 	// physics
 	case SCENE_NUMBER::SCENE0p:
 		currentScene = new Scene0p();
@@ -148,6 +157,9 @@ bool SceneManager::BuildNewScene(SCENE_NUMBER scene) {
 		break;
 	case SCENE_NUMBER::SCENE3p:
 		currentScene = new Scene3p();
+		break;
+	case SCENE_NUMBER::SCENE4p:
+		currentScene = new Scene4p();
 		break;
 
 	default:

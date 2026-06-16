@@ -135,6 +135,7 @@
     <ClCompile Include="Collision.cpp" />
     <ClCompile Include="Debug.cpp" />
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="Noise.cpp" />
     <ClCompile Include="Scene0g.cpp" />
     <ClCompile Include="Scene0p.cpp" />
     <ClCompile Include="Scene1g.cpp" />
@@ -142,6 +143,9 @@
     <ClCompile Include="Scene1p.cpp" />
     <ClCompile Include="Scene3g.cpp" />
     <ClCompile Include="Scene3p.cpp" />
+    <ClCompile Include="Scene4g.cpp" />
+    <ClCompile Include="Scene4p.cpp" />
+    <ClCompile Include="Scene5g.cpp" />
     <ClCompile Include="SceneLight.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -159,6 +163,7 @@
     <ClInclude Include="Collision.h" />
     <ClInclude Include="Debug.h" />
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="Noise.h" />
     <ClInclude Include="Scene0g.h" />
     <ClInclude Include="Scene0p.h" />
     <ClInclude Include="Scene1g.h" />
@@ -166,6 +171,9 @@
     <ClInclude Include="Scene1p.h" />
     <ClInclude Include="Scene3g.h" />
     <ClInclude Include="Scene3p.h" />
+    <ClInclude Include="Scene4g.h" />
+    <ClInclude Include="Scene4p.h" />
+    <ClInclude Include="Scene5g.h" />
     <ClInclude Include="SceneLight.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="Scene.h" />
@@ -187,6 +195,8 @@
     <None Include="shaders\defaultVert.glsl" />
     <None Include="shaders\fresnelFrag.glsl" />
     <None Include="shaders\fresnelVert.glsl" />
+    <None Include="shaders\noiseFrag.glsl" />
+    <None Include="shaders\noiseVert.glsl" />
     <None Include="shaders\phongFrag.glsl" />
     <None Include="shaders\phongVert.glsl" />
     <None Include="shaders\reflectionFrag.glsl" />
@@ -195,6 +205,10 @@
     <None Include="shaders\refractionVert.glsl" />
     <None Include="shaders\skyboxFrag.glsl" />
     <None Include="shaders\skyboxVert.glsl" />
+    <None Include="shaders\tessillationControl.glsl" />
+    <None Include="shaders\tessillationEval.glsl" />
+    <None Include="shaders\tessillationFrag.glsl" />
+    <None Include="shaders\tessillationVert.glsl" />
     <None Include="shaders\textureMultiPhongFrag.glsl" />
     <None Include="shaders\textureMultiPhongVert.glsl" />
     <None Include="shaders\texturePhongFrag.glsl" />
