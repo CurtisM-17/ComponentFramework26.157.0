@@ -249,16 +249,16 @@
     <None Include="shaders\noiseVert.glsl">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="shaders\tessillationControl.glsl">
+    <None Include="shaders\tessellationControl.glsl">
       <Filter>Resource Files\tessillation</Filter>
     </None>
-    <None Include="shaders\tessillationEval.glsl">
+    <None Include="shaders\tessellationEval.glsl">
       <Filter>Resource Files\tessillation</Filter>
     </None>
-    <None Include="shaders\tessillationFrag.glsl">
+    <None Include="shaders\tessellationFrag.glsl">
       <Filter>Resource Files\tessillation</Filter>
     </None>
-    <None Include="shaders\tessillationVert.glsl">
+    <None Include="shaders\tessellationVert.glsl">
       <Filter>Resource Files\tessillation</Filter>
     </None>
   </ItemGroup>

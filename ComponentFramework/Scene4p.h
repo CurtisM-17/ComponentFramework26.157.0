@@ -28,6 +28,7 @@ private:
 	Body* target;
 	Plane skeletonPlane;
 	float forearmLength, upperarmLength;
+	float angle, totalTime;
 	
 	Trackball trackball;
 

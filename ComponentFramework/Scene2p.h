@@ -37,6 +37,8 @@ private:
 	Vec3 cameraOffset;
 	Quaternion cameraOrientation, oldCameraOrientation;
 
+	bool rolling = true;
+
 public:
 	explicit Scene2p();
 	virtual ~Scene2p();
@@ -46,6 +48,8 @@ public:
 	virtual void Update(const float deltaTime) override;
 	virtual void Render() const override;
 	virtual void HandleEvents(const SDL_Event& sdlEvent) override;
+
+	void LinearToAngular(Body& a) const;
 };
 
 

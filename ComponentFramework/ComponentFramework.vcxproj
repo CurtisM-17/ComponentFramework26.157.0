@@ -205,10 +205,10 @@
     <None Include="shaders\refractionVert.glsl" />
     <None Include="shaders\skyboxFrag.glsl" />
     <None Include="shaders\skyboxVert.glsl" />
-    <None Include="shaders\tessillationControl.glsl" />
-    <None Include="shaders\tessillationEval.glsl" />
-    <None Include="shaders\tessillationFrag.glsl" />
-    <None Include="shaders\tessillationVert.glsl" />
+    <None Include="shaders\tessellationControl.glsl" />
+    <None Include="shaders\tessellationEval.glsl" />
+    <None Include="shaders\tessellationFrag.glsl" />
+    <None Include="shaders\tessellationVert.glsl" />
     <None Include="shaders\textureMultiPhongFrag.glsl" />
     <None Include="shaders\textureMultiPhongVert.glsl" />
     <None Include="shaders\texturePhongFrag.glsl" />

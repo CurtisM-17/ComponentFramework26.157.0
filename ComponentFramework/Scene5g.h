@@ -10,6 +10,7 @@ union SDL_Event;
 class Body;
 class Mesh;
 class Shader;
+class Texture;
 
 class Scene5g : public Scene {
 private:
@@ -20,6 +21,7 @@ private:
 	Matrix4 modelMatrix;
 	bool drawInWireMode;
 
+	Texture* heightMap;
 public:
 	explicit Scene5g();
 	virtual ~Scene5g();

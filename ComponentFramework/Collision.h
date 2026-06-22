@@ -10,6 +10,5 @@ namespace COLLISION {
 	bool detection(const Body& a, const Body& b);
 
 	// I will change the velocities of ball a and b (so no const keyword)
-	void response(Body& a, Body& b);
-
+	bool response(Body& a, Body& b);
 }

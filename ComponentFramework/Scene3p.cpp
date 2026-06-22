@@ -34,24 +34,24 @@ bool Scene3p::OnCreate() {
 	// I copied this stuff from the assignment doc
 	// but you don't need the modelmatrix stuff
 	const int numAnchors = 10;
-	Vec3 anchorPos(-6.0f, 0.0f, -25);
+	Vec3 anchorPos(-6.0f, 0.0f, -25.0f);
 	for (int i = 0; i < numAnchors; i++) {
 		anchors.push_back(new Body());
 		anchors[i]->pos = anchorPos;
 		anchors[i]->SetRadius(0.5f);
 		// Move the anchor position for the next swing through this loop
 		anchorPos += Vec3(spacing, 0, 0);
-	}
 
-	// Umer will attempt one tentacle
-	// TODO for YOU (part 1 of assignment)
-	// Set up all 10 tentacles
-	for (int i = 0; i < numSpheresPerAnchor; i++) {
-		tentacleSpheres.push_back(new Body());
-		// I learned this trick from Daniel to get the latest one pushed onto the list
-		tentacleSpheres.back()->pos = anchors[0]->pos + Vec3(0, -spacing * (i+1), 0);
-		tentacleSpheres.back()->SetRadius(0.2f);
+		// Set up all 10 tentacles
+		for (int j = 0; j < numSpheresPerAnchor; j++) {
+			Body* sphere = new Body();
 
+			// I learned this trick from Daniel to get the latest one pushed onto the list
+			sphere->pos = anchors[i]->pos + Vec3(0, -spacing * (j + 1), 0);
+			sphere->SetRadius(0.2f);
+
+			tentacleSpheres.push_back(sphere);
+		}
 	}
 
 	sphereMesh = new Mesh("meshes/Sphere.obj");

@@ -8,6 +8,7 @@
 #include "Mesh.h"
 #include "Shader.h"
 #include "Body.h"
+#include "Texture.h"
 
 Scene5g::Scene5g() : 
 	shader{nullptr}, mesh{nullptr}, drawInWireMode{true} 
@@ -25,14 +26,28 @@ bool Scene5g::OnCreate() {
 	mesh = new Mesh("meshes/Plane.obj");
 	mesh->OnCreate();
 
-	shader = new Shader("shaders/defaultVert.glsl", "shaders/defaultFrag.glsl");
+	heightMap = new Texture();
+	heightMap->LoadImage("textures/terrainHeight.png");
+
+	shader = new Shader(
+		"shaders/tessellationVert.glsl", 
+		"shaders/tessellationFrag.glsl",
+		"shaders/tessellationControl.glsl",
+		"shaders/tessellationEval.glsl",
+		nullptr
+	);
 	if (shader->OnCreate() == false) {
 		std::cout << "Shader failed ... we have a problem\n";
 	}
 
 	projectionMatrix = MMath::perspective(45.0f, (16.0f / 9.0f), 0.5f, 100.0f);
 	viewMatrix = MMath::lookAt(Vec3(0.0f, 0.0f, 15.0f), Vec3(0.0f, 0.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f));
-	modelMatrix.loadIdentity();
+	//modelMatrix.loadIdentity();
+	modelMatrix = (
+		MMath::translate(Vec3(0, 0, -20)) *
+		MMath::rotate(60.0f, Vec3(-1.0f, 0.0f, 0.0f)) *
+		MMath::scale(Vec3(3.0f, 3.0f, 3.0f))
+	);
 	return true;
 }
 
@@ -77,10 +92,13 @@ void Scene5g::Render() const {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
 	glUseProgram(shader->GetProgram());
+
 	glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, projectionMatrix);
 	glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, viewMatrix);
 	glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, modelMatrix);
-	mesh->Render(GL_TRIANGLES);
+	glBindTexture(GL_TEXTURE_2D, heightMap->getTextureID());
+	
+	mesh->Render(GL_PATCHES);
 	glUseProgram(0);
 }
 

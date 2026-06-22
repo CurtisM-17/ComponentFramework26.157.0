@@ -19,7 +19,11 @@ Scene4p::Scene4p() :
 	sphereMesh{nullptr},
 	drawInWireMode{true},
 	target{ nullptr },
-	skeletonPlane()
+	skeletonPlane(),
+	angle(),
+	forearmLength(),
+	joints(),
+	upperarmLength()
 {
 	Debug::Info("Created Scene4p: ", __FILE__, __LINE__);
 }
@@ -147,7 +151,7 @@ void Scene4p::HandleEvents(const SDL_Event& sdlEvent) {
 		// Make a line through the camera position and the mouse position at the front plane
 		DualQuat line = join(Vec4(cameraPos, 1.0f), mousePosWorldSpace);
 		Vec4 target4d = meet(line, skeletonPlane);
-		target->pos = VMath::perspectiveDivide(target4d);
+		//target->pos = VMath::perspectiveDivide(target4d);
 		
 		break;
 	}
@@ -196,6 +200,14 @@ void Scene4p::Update(const float deltaTime) {
 	// Divide out the w
 	joints[5]->pos = VMath::perspectiveDivide(handPos4d);
 
+	// sine wave
+	totalTime += deltaTime;
+	static float angularVelocity = 1.0f;
+	angle = angularVelocity * totalTime;
+
+	target->pos.x = sin(angle + 90.0f * DEGREES_TO_RADIANS) + 3;
+	target->pos.y = sin(angle) + 3;
+
 	viewMatrix = 
 		MMath::toMatrix4(QMath::inverse(cameraOrientation)) *
 		MMath::translate(-cameraPos);
@@ -226,10 +238,12 @@ void Scene4p::Render() const {
 	}
 
 	// Rendering the mouse target position
+	/*
 	Vec4 white = Vec4(1, 1, 1, 0);
 	glUniform4fv(shader->GetUniformID("color"), 1, white);
 	glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, target->GetModelMatrix());
 	sphereMesh->Render(GL_TRIANGLES);
+	*/
 
 	glUseProgram(0);
 }

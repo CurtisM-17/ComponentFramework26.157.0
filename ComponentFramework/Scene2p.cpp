@@ -80,6 +80,7 @@ bool Scene2p::OnCreate() {
 	// First three numbers is the normal
 	// Last number is distance to the origin
 	planeShape.set(0, 1, 0, 0);
+
 	return true;
 }
 
@@ -105,45 +106,12 @@ void Scene2p::HandleEvents(const SDL_Event& sdlEvent) {
 	// Send the event to the trackball
 	trackball.HandleEvents(sdlEvent);
 
-	float angleDeg = 1.0f;
 	switch (sdlEvent.type) {
 	case SDL_EVENT_KEY_DOWN:
 		switch (sdlEvent.key.scancode) {
 		case SDL_SCANCODE_W:
 			drawInWireMode = !drawInWireMode;
 			break;
-		case SDL_SCANCODE_LEFT:
-		{
-			Quaternion rotation = QMath::angleAxisRotation(angleDeg, Vec3(0, 0, 1));
-			// Apply this rotation to the orientation
-			// Be careful as order matters
-			plane->SetOrientation(rotation * plane->GetOrientation());
-			planeShape.n = QMath::rotate(planeShape.n, rotation);
-		}
-		break;
-		case SDL_SCANCODE_RIGHT:
-		{
-			Quaternion rotation = QMath::angleAxisRotation(angleDeg, Vec3(0, 0, -1));
-			plane->SetOrientation(rotation * plane->GetOrientation());
-			planeShape.n = QMath::rotate(planeShape.n, rotation);
-		}
-		break;
-		// TODO for YOU
-		// Code the UP and DOWN key to rotate the plane towards or away from you
-		case SDL_SCANCODE_UP:
-		{
-			Quaternion rotation = QMath::angleAxisRotation(angleDeg, Vec3(-1, 0, 0));
-			plane->SetOrientation(rotation * plane->GetOrientation());
-			planeShape.n = QMath::rotate(planeShape.n, rotation);
-		}
-		break;
-		case SDL_SCANCODE_DOWN:
-		{
-			Quaternion rotation = QMath::angleAxisRotation(angleDeg, Vec3(1, 0, 0));
-			plane->SetOrientation(rotation * plane->GetOrientation());
-			planeShape.n = QMath::rotate(planeShape.n, rotation);
-		}
-		break;
 		case SDL_SCANCODE_SPACE:
 		{
 			// We are listening to you Scott
@@ -153,7 +121,7 @@ void Scene2p::HandleEvents(const SDL_Event& sdlEvent) {
 			// if w = 0, then translations are NOT allowed
 			// if w = 1, translations are allowed
 			// Set the w component to zero     x  y  z   w
-			Vec4 changeInVelCameraSpace = Vec4(0, 0, -1, 0);
+			Vec4 changeInVelCameraSpace = Vec4(0, 0, -3, 0);
 			Matrix4 cameraToWorld = MMath::inverse(viewMatrix);
 			Vec4 changeInVelWorldSpace = cameraToWorld * changeInVelCameraSpace;
 			cueBall->SetVelocity(cueBall->GetVelocity() + changeInVelWorldSpace);
@@ -179,56 +147,6 @@ void Scene2p::HandleEvents(const SDL_Event& sdlEvent) {
 }
 
 void Scene2p::Update(const float deltaTime) {
-	/*
-	// We actually want to calculate the torque using the angle of the plane
-	float angleRadians = 0; // acos(plane normal DOT up vector)
-	float distanceToPivot = 0; // radius * sin(angleRadians)
-	float weight = 0; // mass * 9.8
-	float torqueMag = weight * distanceToPivot;
-	// Umer has revealed how to determine the direction of the torque
-	// TODO for YOU
-	Vec3 torqueDir; // up CROSS normal (don't forget to normalize after)
-
-	// TODO for YOU for part 2 of assignment
-	// Vec3 torque = Vec3(0, 0, 1);
-
-	// TODO for part 3
-	// Don't hardcode the torque vector like above
-	Vec3 torque = torqueMag * torqueDir;
-	cueBall->ApplyTorque(torque);
-	cueBall->UpdateAngularVelocity(deltaTime);
-	cueBall->UpdateOrientation(deltaTime);
-	// TODO for YOU for part 1 of assignment
-	// Convert angular velocity into a linear one
-	float velMag = 0; // magnitude of angular velocity * radius
-	Vec3  velDir; // normalized angular velocity CROSS plane normal vector
-	cueBall->SetVelocity(velMag * velDir);
-	// */
-
-
-	// Recommendation to you all!
-	// Switch off rolling until you have collisions working
-	if (COLLISION::detection(*cueBall, *targetBall) == true) {
-		COLLISION::response(*cueBall, *targetBall);
-		// TODO for YOU to finish assignment 2
-		// Use something like my code when hitting space
-		// to turn the linear velocity into a roll
-	}
-
-	cueBall->UpdateOrientation(deltaTime);
-	cueBall->Update(deltaTime);
-
-	// Keep the ball on the plane
-	// We will use Scott's PMath to find the distance (instead of Umer's math in the assignment doc)
-	//float distanceFromPlane = PMath::distance(cueBall->GetPos(), planeShape);
-	// TODO for YOU
-	// Based on Umer's scribbles
-	// Move the ball along the plane normal by the amount (radius - distanceFromPlane)
-	// sphere->pos += .....
-	// Umer is making a orbit camera based on his scribbles on the board
-	// Fixed now thanks to Daniel
-	// Rotate the offset
-	// First figure out the change in orientation
 	oldCameraOrientation = cameraOrientation;
 	cameraOrientation = trackball.getQuat();
 	Quaternion changeInOrientation
@@ -245,7 +163,43 @@ void Scene2p::Update(const float deltaTime) {
 	viewMatrix =
 		MMath::toMatrix4(QMath::inverse(cameraOrientation)) *
 		MMath::translate(-cameraPos);
+
+	//// Ball Rolling
+	if (!rolling) return;
+
+	// Recommendation to you all!
+	// Switch off rolling until you have collisions working
+	if (COLLISION::detection(*cueBall, *targetBall) == true) {
+		bool completed = COLLISION::response(*cueBall, *targetBall);
+		// TODO for YOU to finish assignment 2
+		// Use something like my code when hitting space
+		// to turn the linear velocity into a roll
+		
+		if (completed) {
+			LinearToAngular(*cueBall);
+			LinearToAngular(*targetBall);
+		}
+	}
+
+	cueBall->UpdateOrientation(deltaTime);
+	cueBall->Update(deltaTime);
+	targetBall->UpdateOrientation(deltaTime);
+	targetBall->Update(deltaTime);
 }
+
+void Scene2p::LinearToAngular(Body& a) const {
+	// Turn linear velocity into angular
+	// angular velocity = linear velocity / radius
+
+	// Turn the linear vel into an angular vel
+	Vec3 angVelDir = VMath::cross(planeShape.n, a.GetVelocity());
+	// Don't forget to normalize the direction, be careful of zero divide
+	if (VMath::mag(angVelDir) < VERY_SMALL) return;
+	angVelDir = VMath::normalize(angVelDir);
+	float angVelMag = VMath::mag(a.GetVelocity()) / a.GetRadius();
+	a.SetAngularVelocity(angVelMag * angVelDir);
+}
+
 
 void Scene2p::Render() const {
 	/// Set the background color then clear the screen
