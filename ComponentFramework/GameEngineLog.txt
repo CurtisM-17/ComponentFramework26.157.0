@@ -1,16 +1,16 @@
-Fri Jun 19 18:05:23 2026
+Tue Jun 23 00:45:04 2026
 [INFO]: Starting the SceneManager
-[INFO]: OpenGL version: 4.6.0 - Build 32.0.101.8132
-[INFO]: Graphics card vendor Intel
-[INFO]: Graphics card name Intel(R) Arc(TM) 140V GPU (8GB)
-[INFO]: GLSL Version 4.60 - Build 32.0.101.8132
+[INFO]: OpenGL version: 4.6.0 NVIDIA 610.47
+[INFO]: Graphics card vendor NVIDIA Corporation
+[INFO]: Graphics card name NVIDIA GeForce RTX 4070/PCIe/SSE2
+[INFO]: GLSL Version 4.60 NVIDIA
 [INFO]: Created Scene3p: 
 [INFO]: Loading assets Scene3p: 
 [INFO]: Uniforms:
+"color" loc:3
 "modelMatrix" loc:2
 "projectionMatrix" loc:0
 "viewMatrix" loc:1
-"color" loc:3
 
 [INFO]: Uniforms:
 "orientationMatrix" loc:1

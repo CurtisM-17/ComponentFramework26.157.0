@@ -162,8 +162,8 @@ void Scene4g::Update(const float deltaTime) {
 	sphereModelMatrix = (
 		MMath::translate(Vec3(2.0f, 1.0f, -2.0f)) *
 		MMath::rotate(cubeRotation.x, Vec3(0.0f, -1.0f, 0.0f)) *
-		MMath::rotate(cubeRotation.y, Vec3(-1.0f, 0.0f, 0.0f)) //*
-		//MMath::rotate(180, Vec3(0.0f, -1.0f, 0.0f))
+		MMath::rotate(cubeRotation.y, Vec3(-1.0f, 0.0f, 0.0f)) *
+		MMath::scale(Vec3(0.75f, 0.75f, 0.75f))
 	);
 
 	camera.orientation = QMath::inverse(trackball.getQuat()); // camera

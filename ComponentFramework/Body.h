@@ -81,6 +81,7 @@ public:
 	void StraightLineConstraint(float slope, float yIntercept, float deltaTime);
 	void QuadraticConstraint(float a, float b, float c, float deltaTime);
 	void CircleConstraint(Vec3 circleCentre, float radius, float deltaTime);
+	void RodConstraint(Vec3 anchorPoint, float rodLength, float deltaTime);
 };
 
 #endif

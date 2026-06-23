@@ -159,6 +159,46 @@ void Body::CircleConstraint(Vec3 circleCentre, float radius, float deltaTime) {
 	vel += JT * lagrangian / mass;
 }
 
+void Body::RodConstraint(Vec3 anchorPoint, float rodLength, float deltaTime) {
+	if (deltaTime < VERY_SMALL) return;
+
+	// Step 1 - Rod vector = direction from this sphere up to its anchor point above
+	// SA = anchorPoint - pos = [x, y, z]
+	Vec3 rodVector = anchorPoint - pos;
+
+	// Step 2 - Position constraint
+	// |SA| - rodLength = 0 (distance has to to equal the rod length)
+	float rodMag = VMath::mag(rodVector);
+	if (rodMag < VERY_SMALL) return;
+
+	float positionConstraint = rodMag - rodLength;
+
+	// Step 3 - JV = Jacobian * velocity
+	// J = (1 / |SA|) * (x, y, z) // page 14
+	// JV = dot(rodVector, vel) / |SA|
+	float JV = VMath::dot(rodVector, vel) / rodMag;
+
+	// Step 4 - Bias term using Baumgarte stabilization
+	// Prevents drift from building up over time
+	// b = -(beta / deltaTime) * positionConstraint
+	const float beta = 0.05f;
+	float b = -(beta / deltaTime) * positionConstraint;
+
+	// Step 5 - Lagrangian multiplier
+	// lambda = -mass * (JV + b)
+	// (JM^-1J^T simplifies to 1/mass for a rigid rod, so mass cancels nicely)
+	float lambda = -mass * (JV + b);
+
+	// Step 6 - J transposed = the unit rod direction (direction to punch the sphere)
+	Vec3 Jtransposed = rodVector / rodMag;
+
+	// Step 7 - Change in velocity = M^-1 * J^T * lambda
+	Vec3 deltaVel = Jtransposed * lambda / mass;
+
+	// Step 8 - Apply the velocity correction
+	vel += deltaVel;
+}
+
 bool Body::OnCreate() {
 	return true;
 }

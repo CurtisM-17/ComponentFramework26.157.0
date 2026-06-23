@@ -101,8 +101,16 @@ void Scene3p::OnDestroy() {
 
 	for (Body* tentacleSphere : tentacleSpheres) {
 		delete tentacleSphere;
+		tentacleSphere = nullptr;
 	}
 	tentacleSpheres.clear();
+}
+
+// Move anchors with sphere
+void Scene3p::MoveAnchors(Vec3 movement) { 
+	for (int i = 0; i < anchors.size(); i++) {
+		anchors[i]->pos += movement;
+	}
 }
 
 void Scene3p::HandleEvents(const SDL_Event& sdlEvent) {
@@ -119,41 +127,39 @@ void Scene3p::HandleEvents(const SDL_Event& sdlEvent) {
 		case SDL_SCANCODE_LEFT:
 		{
 			jellyfishHead->pos.x -= deltaPos;
-			anchors[0]->pos.x -= deltaPos;
+			MoveAnchors(Vec3(-deltaPos, 0, 0));
 		}
 		break;
 		case SDL_SCANCODE_RIGHT:
 		{
 			jellyfishHead->pos.x += deltaPos;
-			anchors[0]->pos.x += deltaPos;
+			MoveAnchors(Vec3(deltaPos, 0, 0));
 		}
 		break;
 		case SDL_SCANCODE_DOWN:
 		{
 			jellyfishHead->pos.y -= deltaPos;
-			anchors[0]->pos.y -= deltaPos;
+			MoveAnchors(Vec3(0, -deltaPos, 0));
 		}
 		break;
 		case SDL_SCANCODE_UP:
 		{
 			jellyfishHead->pos.y += deltaPos;
-			anchors[0]->pos.y += deltaPos;
+			MoveAnchors(Vec3(0, deltaPos, 0));
 		}
 		break;
 		case SDL_SCANCODE_I:
 		{
 			jellyfishHead->pos.z += deltaPos;
-			anchors[0]->pos.z += deltaPos;
+			MoveAnchors(Vec3(0, 0, deltaPos));
 		}
 		break;
 		case SDL_SCANCODE_P:
 		{
 			jellyfishHead->pos.z -= deltaPos;
-			anchors[0]->pos.z -= deltaPos;
+			MoveAnchors(Vec3(0, 0, -deltaPos));
 		}
 		break;
-		// TODO for YOU
-		// Code the UP and DOWN key and something for IN and OUT 
 
 		case SDL_SCANCODE_SPACE:
 		{
@@ -168,30 +174,60 @@ void Scene3p::HandleEvents(const SDL_Event& sdlEvent) {
 }
 
 void Scene3p::Update(const float deltaTime) {
-	Vec3 gravAcc = Vec3(0, -1.0f, 0);
-	// Umer needs an index to refer to the tentacle above
-	for (int i = 0; i < tentacleSpheres.size(); i++) {
-		// Fg = m * g
-		Vec3 gravForce = tentacleSpheres[i]->GetMass() * gravAcc;
-		// F_drag = -dragCoeff * vel
-		float dragCoeff = 0.5f;
-		Vec3 dragForce = -dragCoeff * tentacleSpheres[i]->GetVelocity();
+	const static Vec3 gravAcc = Vec3(0, -1.0f, 0);
+	const static float dragCoeff = 2.5f;
+	
+	for (int anchor = 0; anchor < anchors.size(); anchor++) {
+		for (int i = 0; i < numSpheresPerAnchor; i++) { // each sphere in this anchor
+			int sphereIndex = anchor * numSpheresPerAnchor + i; // anchor 0 is 0-9 but anchor 1 is 10-19 and so on
+			Body* sphere = tentacleSpheres[sphereIndex];
 
-		tentacleSpheres[i]->ApplyForce(gravForce + dragForce);
-		tentacleSpheres[i]->UpdateVelocity(deltaTime);
-		// Do the constraint to correct the velocity
-		//float slope = 2;
-		//float yIntercept = 3;
-		//tentacleSpheres[i]->StraightLineConstraint(slope, yIntercept, deltaTime);
+			// Fg = m * g
+			Vec3 gravForce = sphere->GetMass() * gravAcc;
+			// F_drag = -dragCoeff * vel
+			Vec3 dragForce = -dragCoeff * sphere->GetVelocity();
 
-		//float a = 2;
-		//float b = -4;
-		//float c = 1;
-		//tentacleSpheres[i]->QuadraticConstraint(a, b, c, deltaTime);
+			if (VMath::mag(sphere->GetVelocity()) > 1.0f) {
+				// Switch to turbulent flow if the spheres are moving fast
+				// -cv^2
+				// Keeps the constraint stable when the spheres whip around
+				dragForce = -dragCoeff * sphere->GetVelocity() * VMath::mag(sphere->GetVelocity());
+			}
 
-		//tentacleSpheres[i]->UpdatePosition(deltaTime);
+			sphere->ApplyForce(gravForce + dragForce);
+			sphere->UpdateVelocity(deltaTime);
+
+			Vec3 anchorPoint;
+			if (i == 0) {
+				// First sphere in the tentacle (hanging from the anchor)
+				anchorPoint = anchors[anchor]->pos;
+			}
+			else {
+				// Every other sphere hangs from the sphere above it
+				int parentIndex = anchor * numSpheresPerAnchor + (i - 1);
+				anchorPoint = tentacleSpheres[parentIndex]->pos;
+			}
+
+			// Rod Constraint
+			sphere->RodConstraint(anchorPoint, spacing, deltaTime);
+
+			// Do the constraint to correct the velocity
+			//float slope = 2;
+			//float yIntercept = 3;
+			//tentacleSpheres[i]->StraightLineConstraint(slope, yIntercept, deltaTime);
+
+			//float a = 2;
+			//float b = -4;
+			//float c = 1;
+			//tentacleSpheres[i]->QuadraticConstraint(a, b, c, deltaTime);
+
+			sphere->UpdatePosition(deltaTime);
+		}
 	}
 
+	//if (true) return;
+
+	/*
 	// Do the circle constraint for one tentacle sphere
 	{
 		Vec3 circleCentre = anchors[0]->pos;
@@ -204,31 +240,7 @@ void Scene3p::Update(const float deltaTime) {
 
 		
 	}
-
-	
-
-	// Umer is making a orbit camera based on his scribbles on the board
-	// Fixed now thanks to Daniel
-	// Rotate the offset
-	// First figure out the change in orientation
-	/*
-	cameraOrientationOld = cameraOrientation;
-	cameraOrientation = trackball.getQuat();
-	Quaternion changeInOrientation
-		= cameraOrientation * QMath::inverse(cameraOrientationOld);
-	// Then rotate the cameraOffset
-	cameraOffset = QMath::rotate(cameraOffset, changeInOrientation);
-	// Then use the offset
-	camera.pos = jellyfishHead->GetPos() + cameraOffset;
 	*/
-
-	// Rebuild the camera's view matrix
-	// Based on position and orientation
-	// Scott demands we go back to the origin
-	// AND THEN look back down -z
-	//viewMatrix =
-		//MMath::toMatrix4(QMath::inverse(cameraOrientation)) *
-		//MMath::translate(-cameraPos);
 }
 
 void Scene3p::Render() const {
