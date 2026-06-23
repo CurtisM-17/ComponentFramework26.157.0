@@ -24,6 +24,7 @@ private: /// Physics stuff
 	Quaternion orientation;
 	Vec3 angularVel, angularAcc;
 	float radius;
+	Vec3 color;
 private: /// Graphics stuff 
 	Mesh *mesh;
 	Texture *texture;
@@ -47,6 +48,7 @@ public:
 	Matrix4 GetModelMatrix() const; // done in Body.cpp, no setter needed (pos * orientation * scale)
 	Vec3 GetVelocity() { return vel; }
 	float GetMass() const { return mass; }
+	Vec3 GetColor() const { return Vec4(color.x, color.y, color.z, 255.0f) / 255.0f; }
 
 	///////////// Setters /////////////
 	void SetAccel(const Vec3& accel_) { accel = accel_; }
@@ -61,6 +63,8 @@ public:
 		assert(mass_ > VERY_SMALL);
 		mass = mass_;
 	}
+	void SetColor(float r, float g, float b) { color = Vec3(r, g, b); }
+	void SetColor(Vec3 _color) { color = _color; }
 
 	///////////// Apply force /////////////
 	void ApplyForce(Vec3 force);

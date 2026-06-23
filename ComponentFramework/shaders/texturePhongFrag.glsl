@@ -5,7 +5,7 @@ layout(location = 0) out vec4 fragColor;
 uniform sampler2D diffuseTexture;
 layout(location = 0) in vec3 vertNormal;
 layout(location = 1) in vec3 lightDir;
-layout(location = 2) in vec3 eyeDir; 
+layout(location = 2) in vec3 eyeDir;
 layout(location = 3) in vec2 textureCoords;
 
 void main() {

@@ -11,7 +11,8 @@
 #include "Texture.h"
 
 Scene5g::Scene5g() : 
-	shader{nullptr}, mesh{nullptr}, drawInWireMode{true} 
+	shader{nullptr}, mesh{nullptr}, drawInWireMode{true}, 
+	heightMap(), normalMap(), diffuseMap()
 {
 	Debug::Info("Created Scene5: ", __FILE__, __LINE__);
 }
@@ -23,11 +24,19 @@ Scene5g::~Scene5g() {
 bool Scene5g::OnCreate() {
 	Debug::Info("Loading assets Scene5: ", __FILE__, __LINE__);
 	
+	lightPos.set(0.0f, 10.0f, -15.0f);
+
 	mesh = new Mesh("meshes/Plane.obj");
 	mesh->OnCreate();
 
 	heightMap = new Texture();
 	heightMap->LoadImage("textures/terrainHeight.png");
+
+	normalMap = new Texture();
+	normalMap->LoadImage("textures/terrainNormal.png");
+
+	diffuseMap = new Texture();
+	diffuseMap->LoadImage("textures/terrainDiffuse.png");
 
 	shader = new Shader(
 		"shaders/tessellationVert.glsl", 
@@ -96,7 +105,14 @@ void Scene5g::Render() const {
 	glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, projectionMatrix);
 	glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, viewMatrix);
 	glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, modelMatrix);
+	glUniform3fv(shader->GetUniformID("lightPos"), 1, lightPos);
+
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, heightMap->getTextureID());
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, normalMap->getTextureID());
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, diffuseMap->getTextureID());
 	
 	mesh->Render(GL_PATCHES);
 	glUseProgram(0);

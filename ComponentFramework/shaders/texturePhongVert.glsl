@@ -12,7 +12,7 @@ uniform vec3 lightPos;
 
 layout(location = 0) out vec3 vertNormal;
 layout(location = 1) out vec3 lightDir;
-layout(location = 2) out vec3 eyeDir; 
+layout(location = 2) out vec3 eyeDir;
 layout(location = 3) out vec2 textureCoords;
 
 

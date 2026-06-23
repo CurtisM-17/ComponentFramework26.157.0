@@ -57,7 +57,7 @@ void Body::ApplyTorque(Vec3 torque) {
 	// Apply torque to the ball and get it to spin
 	// update angular acceleration
 	// angularAcc = inverse of rationInertia * torque
-	float i_edge = ((2 / 5) * mass * radius * radius) + (mass * radius * radius);
+	float i_edge = ((2.0f / 5.0f) * mass * radius * radius) + (mass * radius * radius);
 	rotInertia = Matrix3(
 		i_edge,	 0,    0,
 		  0,   i_edge, 0,
@@ -181,7 +181,7 @@ void Body::RodConstraint(Vec3 anchorPoint, float rodLength, float deltaTime) {
 	// Step 4 - Bias term using Baumgarte stabilization
 	// Prevents drift from building up over time
 	// b = -(beta / deltaTime) * positionConstraint
-	const float beta = 0.05f;
+	const float beta = 0.15f;
 	float b = -(beta / deltaTime) * positionConstraint;
 
 	// Step 5 - Lagrangian multiplier

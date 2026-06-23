@@ -22,6 +22,10 @@ private:
 	bool drawInWireMode;
 
 	Texture* heightMap;
+	Texture* normalMap;
+	Texture* diffuseMap;
+
+	Vec3 lightPos;
 public:
 	explicit Scene5g();
 	virtual ~Scene5g();

@@ -18,6 +18,7 @@ layout(location = 2) out vec3 eyeDir;
 void main() {
 	mat3 normalMatrix = mat3(transpose(inverse(modelMatrix)));
 	vertNormal = normalize(normalMatrix * vNormal); /// Rotate the normal to the correct orientation 
+	
 	vec3 vertPos = vec3(viewMatrix * modelMatrix * vVertex);
 	vec3 vertDir = normalize(vertPos);
 	eyeDir = -vertDir;

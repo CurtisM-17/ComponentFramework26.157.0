@@ -28,7 +28,12 @@ private:
 	Body* target;
 	Plane skeletonPlane;
 	float forearmLength, upperarmLength;
+	float shinLength, thighLength;
+	Vec3 leftToeOffset, rightToeOffset;
 	float angle, totalTime;
+	bool renderCursor;
+
+	int currentLimb; // 0-3; 0 = right arm, 1 = left arm, 2 = left leg, 3 = right leg
 	
 	Trackball trackball;
 
@@ -52,6 +57,8 @@ public:
 	virtual void Update(const float deltaTime) override;
 	virtual void Render() const override;
 	virtual void HandleEvents(const SDL_Event &sdlEvent) override;
+
+	void IK(int from, int to, float length);
 };
 
 

@@ -23,7 +23,14 @@ Scene4p::Scene4p() :
 	angle(),
 	forearmLength(),
 	joints(),
-	upperarmLength()
+	upperarmLength(),
+	totalTime(),
+	currentLimb(4),
+	leftToeOffset(),
+	rightToeOffset(),
+	thighLength(),
+	shinLength(),
+	renderCursor(false)
 {
 	Debug::Info("Created Scene4p: ", __FILE__, __LINE__);
 }
@@ -40,33 +47,74 @@ bool Scene4p::OnCreate() {
 	DualQuat L = DualQuat(0, 0, 0, 1, 0, 0, 0, 0);
 	Vec4 newDir = ((L * v) * DQMath::inverse(L)).point;
 
-
-
-
 	target = new Body();
 	target->SetRadius(0.1f);
 	target->pos = Vec3(3, 3, 0);
 
-
+	// Joints
 	for (int i = 0; i < joints.size(); i++) {
 		joints[i] = new Body();
 		joints[i]->SetRadius(0.1f);
 		joints[i]->pos = Vec3(0, 3, 0);
 	}
 
-	joints[0]->SetRadius(0.4f);
+	const static Vec3 HEAD_COLOR(0, 0, 255);
+	const static Vec3 ARM_COLOR(0, 191, 255);
+	const static Vec3 LEG_COLOR(255, 255, 0);
+	const static float COLOR_CHANGE = 0.5f; // Multiply other limb to darken
 
-	joints[0]->pos = Vec3(0, 4, 0); // head
+	// Head
+	joints[0]->SetRadius(0.4f);
+	joints[0]->pos = Vec3(0, 4, 0);
+	joints[0]->SetColor(HEAD_COLOR);
+
 	joints[1]->pos = Vec3(0, 3, 0); //neck
+	joints[1]->SetColor(HEAD_COLOR);
 	joints[2]->pos = Vec3(0, 1, 0); //pelvis
+	joints[2]->SetColor(HEAD_COLOR);
 
 	// left arm
 	joints[3]->pos = Vec3(1, 3, 0); // shoulder
+	joints[3]->SetColor(ARM_COLOR);
 	joints[4]->pos = Vec3(1.5, 2, 0); //elbow
+	joints[4]->SetColor(ARM_COLOR);
 	joints[5]->pos = Vec3(1, 1, 0); // hand
+	joints[5]->SetColor(ARM_COLOR);
+
+	// right arm
+	joints[6]->pos = Vec3(-1, 3, 0); // shoulder
+	joints[6]->SetColor(ARM_COLOR * COLOR_CHANGE);
+	joints[7]->pos = Vec3(-1.5, 2, 0); //elbow
+	joints[7]->SetColor(ARM_COLOR * COLOR_CHANGE);
+	joints[8]->pos = Vec3(-1, 1, 0); // hand
+	joints[8]->SetColor(ARM_COLOR * COLOR_CHANGE);
+
+	// left leg
+	joints[9]->pos = Vec3(0.5f, 0.8f, 0.0f); // hip
+	joints[9]->SetColor(LEG_COLOR * COLOR_CHANGE);
+	joints[10]->pos = Vec3(0.5f, -1.2f, 0.0f); // knee
+	joints[10]->SetColor(LEG_COLOR * COLOR_CHANGE);
+	joints[11]->pos = Vec3(0.5f, -3.2f, 0.0f); // ankle
+	joints[11]->SetColor(LEG_COLOR * COLOR_CHANGE);
+	joints[15]->pos = Vec3(0.8f, -3.2f, 0.0f); // toe
+	joints[15]->SetColor(LEG_COLOR * COLOR_CHANGE);
+	leftToeOffset = joints[15]->pos - joints[11]->pos;
+
+	// right leg
+	joints[12]->pos = Vec3(-0.5f, 0.8f, 0.0f); // hip
+	joints[12]->SetColor(LEG_COLOR);
+	joints[13]->pos = Vec3(-0.5f, -1.2f, 0.0f); // knee
+	joints[13]->SetColor(LEG_COLOR);
+	joints[14]->pos = Vec3(-0.5f, -3.2f, 0.0f); // ankle
+	joints[14]->SetColor(LEG_COLOR);
+	joints[16]->pos = Vec3(-0.8f, -3.2f, 0.0f); // toe
+	joints[16]->SetColor(LEG_COLOR);
+	rightToeOffset = joints[16]->pos - joints[14]->pos;
 
 	forearmLength = VMath::distance(joints[5]->pos, joints[4]->pos);
 	upperarmLength = VMath::distance(joints[4]->pos, joints[3]->pos);
+	shinLength = VMath::distance(joints[11]->pos, joints[10]->pos);
+	thighLength = VMath::distance(joints[10]->pos, joints[9]->pos);
 
 	// Make the plane where the skeleton lives
 	// Can join three points to make a plane
@@ -83,7 +131,11 @@ bool Scene4p::OnCreate() {
 	}
 
 	projectionMatrix = MMath::perspective(45.0f, (16.0f / 9.0f), 0.5f, 100.0f);
-	cameraPos = Vec3(0, 0, 12);
+	cameraPos = Vec3(0, 0.5, 12);
+
+	viewMatrix =
+		MMath::toMatrix4(QMath::inverse(cameraOrientation)) *
+		MMath::translate(-cameraPos);
 	
 	return true;
 }
@@ -116,6 +168,24 @@ void Scene4p::HandleEvents(const SDL_Event& sdlEvent) {
 		switch (sdlEvent.key.scancode) {
 		case SDL_SCANCODE_W:
 			drawInWireMode = !drawInWireMode;
+			break;
+		case SDL_SCANCODE_1:
+			currentLimb = 0;
+			break;
+		case SDL_SCANCODE_2:
+			currentLimb = 1;
+			break;
+		case SDL_SCANCODE_3:
+			currentLimb = 3;
+			break;
+		case SDL_SCANCODE_4:
+			currentLimb = 2;
+			break;
+		case SDL_SCANCODE_5:
+			currentLimb = 4;
+			break;
+		case SDL_SCANCODE_E:
+			renderCursor = !renderCursor;
 			break;
 
 		default:
@@ -151,66 +221,63 @@ void Scene4p::HandleEvents(const SDL_Event& sdlEvent) {
 		// Make a line through the camera position and the mouse position at the front plane
 		DualQuat line = join(Vec4(cameraPos, 1.0f), mousePosWorldSpace);
 		Vec4 target4d = meet(line, skeletonPlane);
-		//target->pos = VMath::perspectiveDivide(target4d);
+		target->pos = VMath::perspectiveDivide(target4d);
 		
 		break;
 	}
 }
 
+void Scene4p::IK(int from, int to, float length) {
+	DualQuat lineHandToElbow = join(Vec4(joints[from]->pos, 1), Vec4(joints[to]->pos, 1));
+	joints[to]->pos = joints[from]->pos;
+	DualQuat translatorHandToElbow = DQMath::translateAlongLine(length, lineHandToElbow);
+	// Next step is the sandwich
+	Vec4 elbowPos4d = DQMath::rigidTransformation(translatorHandToElbow, Vec4(joints[to]->pos, 1));
+	// Just in case the w is messed up, divide it out
+	joints[to]->pos = VMath::perspectiveDivide(elbowPos4d);
+}
+
 void Scene4p::Update(const float deltaTime) {
-	// left arm
-	// joints[3]->pos // shoulder
-	// joints[4]->pos // elbow
-	// joints[5]->pos // hand
+	if (currentLimb >= 4) return;
+
+	int top = (currentLimb + 1) * 3;
+	int middle = ((currentLimb + 1) * 3) + 1;
+	int bottom = ((currentLimb + 1) * 3) + 2;
+
+	float upperLength = (currentLimb < 2) ? upperarmLength : thighLength;
+	float lowerLength = (currentLimb < 2) ? forearmLength : shinLength;
 
 	// Let's do the backwards part of FABRIK
 	// Step one, put the hand on the target
-	joints[5]->pos = target->pos;
+	joints[bottom]->pos = target->pos;
 
 	// Step two. Stick the elbow on the hand
 	// And translate along a line from hand to elbow
 	// by the amount forearmLength
-	DualQuat lineHandToElbow = join(Vec4(joints[5]->pos, 1), Vec4(joints[4]->pos, 1));
-	joints[4]->pos = joints[5]->pos;
-	DualQuat translatorHandToElbow = DQMath::translateAlongLine(forearmLength, lineHandToElbow);
-	// Next step is the sandwich
-	Vec4 elbowPos4d = DQMath::rigidTransformation(translatorHandToElbow, Vec4(joints[4]->pos, 1));
-	// Just in case the w is messed up, divide it out
-	joints[4]->pos = VMath::perspectiveDivide(elbowPos4d);
+	IK(bottom, middle, lowerLength);
 
 	// Now for the forward part of FABRIK
 	// Step three. Make a line from shoulder to elbow
 	// Stick the elbow on the shoulder
 	// translate along the line by upperarmLength
-	DualQuat lineShoulderToElbow = join(Vec4(joints[3]->pos, 1), Vec4(joints[4]->pos, 1));
-	joints[4]->pos = joints[3]->pos;
-	DualQuat translatorShoulderToElbow = DQMath::translateAlongLine(upperarmLength, lineShoulderToElbow);
-	elbowPos4d = DQMath::rigidTransformation(translatorShoulderToElbow, Vec4(joints[4]->pos, 1));
-	joints[4]->pos = VMath::perspectiveDivide(elbowPos4d);
+	IK(top, middle, upperLength);
 
 	// Step four. Do the same thing for the hand
 	// Make a line from elbow to hand
-	DualQuat lineElbowToHand = join(Vec4(joints[4]->pos, 1), Vec4(joints[5]->pos, 1));
-	// Stick the hand on the elbow
-	joints[5]->pos = joints[4]->pos;
-	// Translate by the forearm length
-	DualQuat translatorElbowToHand = DQMath::translateAlongLine(forearmLength, lineElbowToHand);
-	// Sandwich time!
-	Vec4 handPos4d = DQMath::rigidTransformation(translatorElbowToHand, Vec4(joints[5]->pos, 1));
-	// Divide out the w
-	joints[5]->pos = VMath::perspectiveDivide(handPos4d);
+	IK(middle, bottom, lowerLength);
 
 	// sine wave
+	/*
 	totalTime += deltaTime;
 	static float angularVelocity = 1.0f;
 	angle = angularVelocity * totalTime;
 
 	target->pos.x = sin(angle + 90.0f * DEGREES_TO_RADIANS) + 3;
 	target->pos.y = sin(angle) + 3;
+	*/
 
-	viewMatrix = 
-		MMath::toMatrix4(QMath::inverse(cameraOrientation)) *
-		MMath::translate(-cameraPos);
+	joints[15]->pos = joints[11]->pos + leftToeOffset;
+	joints[16]->pos = joints[14]->pos + rightToeOffset;
 }
 
 void Scene4p::Render() const {
@@ -231,19 +298,19 @@ void Scene4p::Render() const {
 	Vec4 pink = Vec4(237, 130, 210, 0) / 255.0f;
 	Vec4 darkerPink = Vec4(227, 43, 181, 0) / 255.0f;
 
-	glUniform4fv(shader->GetUniformID("color"), 1, darkerPink);
 	for (Body* joint : joints) {
+		glUniform4fv(shader->GetUniformID("color"), 1, joint->GetColor());
 		glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, joint->GetModelMatrix());
 		sphereMesh->Render(GL_TRIANGLES);
 	}
 
 	// Rendering the mouse target position
-	/*
-	Vec4 white = Vec4(1, 1, 1, 0);
-	glUniform4fv(shader->GetUniformID("color"), 1, white);
-	glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, target->GetModelMatrix());
-	sphereMesh->Render(GL_TRIANGLES);
-	*/
+	if (renderCursor) {
+		Vec4 white = Vec4(1, 1, 1, 0);
+		glUniform4fv(shader->GetUniformID("color"), 1, white);
+		glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, target->GetModelMatrix());
+		sphereMesh->Render(GL_TRIANGLES);
+	}
 
 	glUseProgram(0);
 }

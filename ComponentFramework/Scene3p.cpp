@@ -174,8 +174,8 @@ void Scene3p::HandleEvents(const SDL_Event& sdlEvent) {
 }
 
 void Scene3p::Update(const float deltaTime) {
-	const static Vec3 gravAcc = Vec3(0, -1.0f, 0);
-	const static float dragCoeff = 2.5f;
+	const static Vec3 gravAcc = Vec3(0, -30.0f, 0);
+	const static float dragCoeff = 20.5f;
 	
 	for (int anchor = 0; anchor < anchors.size(); anchor++) {
 		for (int i = 0; i < numSpheresPerAnchor; i++) { // each sphere in this anchor
@@ -187,12 +187,12 @@ void Scene3p::Update(const float deltaTime) {
 			// F_drag = -dragCoeff * vel
 			Vec3 dragForce = -dragCoeff * sphere->GetVelocity();
 
-			if (VMath::mag(sphere->GetVelocity()) > 1.0f) {
+			//if (VMath::mag(sphere->GetVelocity()) > 1.0f) {
 				// Switch to turbulent flow if the spheres are moving fast
 				// -cv^2
 				// Keeps the constraint stable when the spheres whip around
-				dragForce = -dragCoeff * sphere->GetVelocity() * VMath::mag(sphere->GetVelocity());
-			}
+				//dragForce = -dragCoeff * sphere->GetVelocity() * VMath::mag(sphere->GetVelocity());
+			//}
 
 			sphere->ApplyForce(gravForce + dragForce);
 			sphere->UpdateVelocity(deltaTime);
